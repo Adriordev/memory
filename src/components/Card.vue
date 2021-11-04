@@ -8,21 +8,21 @@
 </template>
 
 <script>
+import { ref } from "vue";
 export default {
-  data() {
-    return {
-      flipped: false,
+  setup() {
+    const flipped = ref(false);
+    const flip = () => {
+      flipped.value = true;
+      setTimeout(() => (flipped.value = false), 3000);
     };
-  },
-  methods: {
-    flip() {
-      this.flipped = true;
-      setTimeout(() => (this.flipped = false), 3000);
-    },
+    return {
+      flipped,
+      flip,
+    };
   },
 };
 </script>
-
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .scene {
