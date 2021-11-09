@@ -1,6 +1,6 @@
 <template>
   <div class="scene">
-    <div class="card" :class="{ 'is-flipped': flipped }" @click="handleFlip">
+    <div class="card" :class="{ 'is-flipped': isFlipped }" @click="handleFlip">
       <div class="card__face card__face--front">MEMORY</div>
       <div class="card__face card__face--back">
         {{ text }}
@@ -10,26 +10,30 @@
 </template>
 
 <script>
-import { ref } from "@vue/reactivity";
 export default {
   props: {
     text: {
       type: Number,
       default: NaN,
     },
+    isFlipped: {
+      type: Boolean,
+      default: false,
+    },
+    index: {
+      type: Number,
+    },
   },
   emits: ["handleFlip"],
 
   setup(props, context) {
-    const flipped = ref(false);
     const handleFlip = () => {
-      context.emit("handleFlip", flipped);
+      context.emit("handleFlip", props.index);
       console.log();
     };
 
     return {
       handleFlip,
-      flipped,
     };
   },
 };

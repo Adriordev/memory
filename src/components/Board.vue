@@ -7,7 +7,9 @@
   </div>
   <div class="board-container">
     <Card
-      :text="index"
+      :text="item.text"
+      :isFlipped="item.isFlipped"
+      :index="index"
       @handleFlip="flip"
       v-for="(item, index) in cards"
       :key="index"
@@ -23,15 +25,32 @@ export default {
   },
   setup() {
     let couple = ref();
-    let cards = ref();
+    let cards = ref([]);
 
     const handleClick = () => {
-      cards.value = 2 * couple.value;
+      cards.value = [];
+      for (var i = 1; i <= 2 * couple.value; i++) {
+        let oneCard = {
+          text: i,
+          isFlipped: false,
+        };
+        cards.value = [...cards.value, oneCard];
+      }
+      console.log(JSON.stringify(cards.value));
     };
 
-    const flip = (flipped) => {
-      flipped.value = true;
-      setTimeout(() => (flipped.value = false), 3000);
+    const flip = (index) => {
+      let countCards = 0;
+      for (var i = 0; i < cards.value.length; i++) {
+        if (cards.value[i].isFlipped === true) {
+          countCards++;
+        }
+      }
+      if (countCards < 2) {
+        const selectCardtoFlip = cards.value[index];
+        selectCardtoFlip.isFlipped = true;
+        //setTimeout(() => (selectCardtoFlip.isFlipped = false), 3000);
+      }
     };
 
     onMounted(() => {
