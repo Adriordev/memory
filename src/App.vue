@@ -1,27 +1,25 @@
 <template>
-  <div class="container">
-    <Card />
-    <Card />
-    <Card />
-    <Card />
-  </div>
+  <Board />
 </template>
 
 <script>
-import Card from "./components/Card.vue";
-
+import Board from "./components/Board.vue";
 export default {
   name: "App",
   components: {
-    Card,
+    Board,
+  },
+  setup() {
+    return {
+      Board,
+    };
   },
 };
 </script>
 
 <style>
-.container {
-  display: flex;
-  gap: 5px;
-  justify-content: center;
+html {
+  text-align: center;
+  margin: 0 auto;
 }
 </style>

@@ -1,35 +1,46 @@
 <template>
   <div class="scene">
-    <div class="card" :class="{ 'is-flipped': flipped }" @click="flip">
+    <div class="card" :class="{ 'is-flipped': flipped }" @click="handleFlip">
       <div class="card__face card__face--front">MEMORY</div>
-      <div class="card__face card__face--back">1</div>
+      <div class="card__face card__face--back">
+        {{ text }}
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref } from "@vue/reactivity";
 export default {
-  setup() {
+  props: {
+    text: {
+      type: Number,
+      default: NaN,
+    },
+  },
+  emits: ["handleFlip"],
+
+  setup(props, context) {
     const flipped = ref(false);
-    const flip = () => {
-      flipped.value = true;
-      setTimeout(() => (flipped.value = false), 3000);
+    const handleFlip = () => {
+      context.emit("handleFlip", flipped);
+      console.log();
     };
+
     return {
+      handleFlip,
       flipped,
-      flip,
     };
   },
 };
 </script>
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+
+<style>
 .scene {
-  width: 200px;
+  width: 21%;
   height: 260px;
   border: 1px solid #ccc;
-  margin: 40px 0;
+  /* margin: 40px 0; */
   perspective: 600px;
 }
 .card {
