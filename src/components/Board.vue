@@ -26,6 +26,7 @@ export default {
   setup() {
     let couple = ref();
     let cards = ref([]);
+    let selectedCards = ref([]);
 
     const handleClick = () => {
       cards.value = [];
@@ -36,20 +37,33 @@ export default {
         };
         cards.value = [...cards.value, oneCard];
       }
-      console.log(JSON.stringify(cards.value));
+      //console.log(JSON.stringify(cards.value));
     };
 
     const flip = (index) => {
       let countCards = 0;
+
       for (var i = 0; i < cards.value.length; i++) {
         if (cards.value[i].isFlipped === true) {
           countCards++;
         }
       }
+
       if (countCards < 2) {
         const selectCardtoFlip = cards.value[index];
         selectCardtoFlip.isFlipped = true;
-        //setTimeout(() => (selectCardtoFlip.isFlipped = false), 3000);
+        selectedCards.value.push(selectCardtoFlip);
+      }
+      if (countCards === 1) {
+        if (selectedCards.value[0].text === selectedCards.value[1].text) {
+          console.log("PREMIO");
+        } else {
+          setTimeout(() => {
+            selectedCards.value.forEach((element) => {
+              element.isFlipped = false;
+            });
+          }, 2000);
+        }
       }
     };
 
