@@ -30,23 +30,19 @@ export default {
     const selectedCards = ref([]);
 
     const createCards = () => {
-      cards.value = [];
-      for (var i = 1; i <= 2 * couplesCount.value; i++) {
-        const oneCard = {
-          text: i,
+      cards.value = [...Array(couplesCount.value * 2).keys()].map((index) => {
+        return {
+          text: index,
           isFlipped: false,
         };
-        cards.value = [...cards.value, oneCard];
-      }
+      });
     };
 
     const flipCard = (index) => {
-      let flippedCardsCount = 0;
-      for (var i = 0; i < cards.value.length; i++) {
-        if (cards.value[i].isFlipped === true) {
-          flippedCardsCount++;
-        }
-      }
+      const flippedCardsCount = cards.value.filter(
+        (card) => card.isFlipped
+      ).length;
+
       if (flippedCardsCount < 2) {
         const selectCardtoFlip = cards.value[index];
         selectCardtoFlip.isFlipped = true;
