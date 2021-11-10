@@ -1,89 +1,87 @@
 <template>
   <div class="generate-board">
     <h3>Board</h3>
-    <label for="couple">Numero de parejas: </label>
-    <input type="number" v-model="couple" @keyup.enter="handleClick" />
-    <button @click="handleClick">crear</button>
+    <label for="couplesCount">Numero de parejas: </label>
+    <input type="number" v-model="couplesCount" @keyup.enter="createCards" />
+    <button @click="createCards">crear</button>
   </div>
   <div class="board-container">
     <Card
       :text="item.text"
       :isFlipped="item.isFlipped"
       :index="index"
-      @handleFlip="flip"
+      @handleFlip="flipCard"
       v-for="(item, index) in cards"
       :key="index"
     />
   </div>
 </template>
+
 <script>
-import { onMounted, onUpdated, ref } from "vue";
+import { ref } from "vue";
 import Card from "./Card.vue";
 export default {
   components: {
     Card,
   },
   setup() {
-    let couple = ref();
-    let cards = ref([]);
-    let selectedCards = ref([]);
+    const couplesCount = ref();
+    const cards = ref([]);
+    const selectedCards = ref([]);
 
-    const handleClick = () => {
+    const createCards = () => {
       cards.value = [];
-      for (var i = 1; i <= 2 * couple.value; i++) {
-        let oneCard = {
+      for (var i = 1; i <= 2 * couplesCount.value; i++) {
+        const oneCard = {
           text: i,
           isFlipped: false,
         };
         cards.value = [...cards.value, oneCard];
       }
-      //console.log(JSON.stringify(cards.value));
     };
 
-    const flip = (index) => {
-      let countCards = 0;
+    const flipCard = (index) => {
+      let flippedCardsCount = 0;
       for (var i = 0; i < cards.value.length; i++) {
         if (cards.value[i].isFlipped === true) {
-          countCards++;
+          flippedCardsCount++;
         }
       }
-      if (countCards < 2) {
+      if (flippedCardsCount < 2) {
         const selectCardtoFlip = cards.value[index];
         selectCardtoFlip.isFlipped = true;
         selectedCards.value.push(selectCardtoFlip);
       }
-      if (countCards === 1) {
+      if (flippedCardsCount === 1) {
         checkCards();
       }
     };
+
     const checkCards = () => {
       if (selectedCards.value[0].text === selectedCards.value[1].text) {
-        //console.log("PREMIO");
+        console.log("PREMIO");
       } else {
         setTimeout(() => {
           selectedCards.value.forEach((element) => {
             element.isFlipped = false;
-          }, (selectedCards.value = []));
+          });
+
+          selectedCards.value = [];
         }, 2000);
       }
     };
-    onMounted(() => {
-      console.log("mounted!");
-    });
-    onUpdated(() => {
-      console.log("updated!");
-    });
 
     return {
-      couple,
+      couplesCount,
       cards,
-      handleClick,
-      flip,
+      createCards,
+      flipCard,
       Card,
     };
   },
 };
 </script>
+
 <style>
 .generate-board {
   text-align: center;
