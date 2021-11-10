@@ -29,7 +29,6 @@ export default {
   setup(props, context) {
     const handleFlip = () => {
       context.emit("handleFlip", props.index);
-      console.log();
     };
 
     return {

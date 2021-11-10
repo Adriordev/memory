@@ -27,7 +27,6 @@ export default {
   setup() {
     const couplesCount = ref();
     const cards = ref([]);
-    const selectedCards = ref([]);
 
     const createCards = () => {
       cards.value = [...Array(couplesCount.value * 2).keys()].map((index) => {
@@ -46,23 +45,22 @@ export default {
       if (flippedCardsCount < 2) {
         const selectCardtoFlip = cards.value[index];
         selectCardtoFlip.isFlipped = true;
-        selectedCards.value.push(selectCardtoFlip);
       }
-      if (flippedCardsCount === 1) {
-        checkCards();
-      }
+
+      checkIfCoupleWasFound();
     };
 
-    const checkCards = () => {
-      if (selectedCards.value[0].text === selectedCards.value[1].text) {
+    const checkIfCoupleWasFound = () => {
+      const flippedCards = cards.value.filter((card) => card.isFlipped);
+      if (flippedCards.length < 2) return;
+
+      if (flippedCards[0].text === flippedCards[1].text) {
         console.log("PREMIO");
       } else {
         setTimeout(() => {
-          selectedCards.value.forEach((element) => {
+          flippedCards.forEach((element) => {
             element.isFlipped = false;
           });
-
-          selectedCards.value = [];
         }, 2000);
       }
     };
