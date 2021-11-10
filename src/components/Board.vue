@@ -42,31 +42,31 @@ export default {
 
     const flip = (index) => {
       let countCards = 0;
-
       for (var i = 0; i < cards.value.length; i++) {
         if (cards.value[i].isFlipped === true) {
           countCards++;
         }
       }
-
       if (countCards < 2) {
         const selectCardtoFlip = cards.value[index];
         selectCardtoFlip.isFlipped = true;
         selectedCards.value.push(selectCardtoFlip);
       }
       if (countCards === 1) {
-        if (selectedCards.value[0].text === selectedCards.value[1].text) {
-          console.log("PREMIO");
-        } else {
-          setTimeout(() => {
-            selectedCards.value.forEach((element) => {
-              element.isFlipped = false;
-            });
-          }, 2000);
-        }
+        checkCards();
       }
     };
-
+    const checkCards = () => {
+      if (selectedCards.value[0].text === selectedCards.value[1].text) {
+        //console.log("PREMIO");
+      } else {
+        setTimeout(() => {
+          selectedCards.value.forEach((element) => {
+            element.isFlipped = false;
+          }, (selectedCards.value = []));
+        }, 2000);
+      }
+    };
     onMounted(() => {
       console.log("mounted!");
     });
