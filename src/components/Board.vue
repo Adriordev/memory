@@ -9,6 +9,7 @@
     <Card
       :text="item.text"
       :isFlipped="item.isFlipped"
+      :isHidden="item.isHidden"
       :index="index"
       @handleFlip="flipCard"
       v-for="(item, index) in cards"
@@ -42,11 +43,13 @@ export default {
         const card = {
           text: index,
           isFlipped: false,
+          isHidden: false,
         };
         cards.value.push(card);
         const card2 = {
           text: index,
           isFlipped: false,
+          isHidden: false,
         };
         cards.value.push(card2);
       }
@@ -72,7 +75,9 @@ export default {
       if (flippedCards.length < 2) return;
 
       if (flippedCards[0].text === flippedCards[1].text) {
-        console.log("PREMIO");
+        flippedCards.forEach((element) => {
+          element.isHidden = true;
+        });
       } else {
         setTimeout(() => {
           flippedCards.forEach((element) => {

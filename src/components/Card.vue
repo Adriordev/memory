@@ -1,6 +1,10 @@
 <template>
   <div class="scene">
-    <div class="card" :class="{ 'is-flipped': isFlipped }" @click="handleFlip">
+    <div
+      class="card"
+      :class="{ 'is-flipped': isFlipped, 'is-hidden': isHidden }"
+      @click="handleFlip"
+    >
       <div class="card__face card__face--front">MEMORY</div>
       <div class="card__face card__face--back">
         {{ text }}
@@ -17,6 +21,10 @@ export default {
       default: NaN,
     },
     isFlipped: {
+      type: Boolean,
+      default: false,
+    },
+    isHidden: {
       type: Boolean,
       default: false,
     },
@@ -57,6 +65,9 @@ export default {
 }
 .card.is-flipped {
   transform: translateX(-100%) rotateY(-180deg);
+}
+.card.is-hidden {
+  visibility: hidden;
 }
 
 .card__face {
