@@ -28,13 +28,30 @@ export default {
     const couplesCount = ref();
     const cards = ref([]);
 
+    const shuffle = (array) => {
+      for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    };
+
     const createCards = () => {
-      cards.value = [...Array(couplesCount.value * 2).keys()].map((index) => {
-        return {
+      cards.value = [];
+      for (let index = 0; index < couplesCount.value; index++) {
+        const card = {
           text: index,
           isFlipped: false,
         };
-      });
+        cards.value.push(card);
+        const card2 = {
+          text: index,
+          isFlipped: false,
+        };
+        cards.value.push(card2);
+      }
+      shuffle(cards.value);
+      console.log("cards.value :>> ", cards.value);
     };
 
     const flipCard = (index) => {
