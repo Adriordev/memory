@@ -1,10 +1,6 @@
 <template>
-  <div class="scene">
-    <div
-      class="card"
-      :class="{ 'is-flipped': isFlipped, 'is-hidden': isHidden }"
-      @click="handleFlip"
-    >
+  <div class="scene" :class="{ 'is-hidden': isHidden }">
+    <div class="card" :class="{ 'is-flipped': isFlipped }" @click="handleFlip">
       <div class="card__face card__face--front">MEMORY</div>
       <div class="card__face card__face--back">
         {{ text }}
@@ -28,7 +24,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    index: {
+    id: {
       type: Number,
     },
   },
@@ -36,7 +32,7 @@ export default {
 
   setup(props, context) {
     const handleFlip = () => {
-      context.emit("handleFlip", props.index);
+      context.emit("handleFlip", props.id);
     };
 
     return {
@@ -66,8 +62,10 @@ export default {
 .card.is-flipped {
   transform: translateX(-100%) rotateY(-180deg);
 }
-.card.is-hidden {
+.scene.is-hidden {
   visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 2s, opacity 2s linear;
 }
 
 .card__face {

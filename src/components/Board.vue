@@ -7,10 +7,7 @@
   </div>
   <div class="board-container">
     <Card
-      :text="item.text"
-      :isFlipped="item.isFlipped"
-      :isHidden="item.isHidden"
-      :index="index"
+      v-bind="item"
       @handleFlip="flipCard"
       v-for="(item, index) in cards"
       :key="index"
@@ -54,16 +51,17 @@ export default {
         cards.value.push(card2);
       }
       shuffle(cards.value);
+      cards.value.map((e, index) => [...cards.value, (e.id = index)]);
       console.log("cards.value :>> ", cards.value);
     };
 
-    const flipCard = (index) => {
+    const flipCard = (id) => {
       const flippedCardsCount = cards.value.filter(
         (card) => card.isFlipped
       ).length;
 
       if (flippedCardsCount < 2) {
-        const selectCardtoFlip = cards.value[index];
+        const selectCardtoFlip = cards.value[id];
         selectCardtoFlip.isFlipped = true;
       }
 
@@ -78,6 +76,11 @@ export default {
         flippedCards.forEach((element) => {
           element.isHidden = true;
         });
+        setTimeout(() => {
+          flippedCards.forEach((element) => {
+            element.isFlipped = false;
+          });
+        }, 2000);
       } else {
         setTimeout(() => {
           flippedCards.forEach((element) => {
