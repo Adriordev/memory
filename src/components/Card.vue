@@ -12,10 +12,6 @@
 <script>
 export default {
   props: {
-    text: {
-      type: Number,
-      default: NaN,
-    },
     isFlipped: {
       type: Boolean,
       default: false,
