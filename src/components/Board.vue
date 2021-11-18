@@ -18,6 +18,7 @@
 <script>
 import { ref } from "vue";
 import Card from "./Card.vue";
+import axios from "axios";
 export default {
   components: {
     Card,
@@ -25,28 +26,35 @@ export default {
   setup() {
     const couplesCount = ref();
     const cards = ref([]);
+    const arrayAPIimages = ref([]);
 
-    const shuffle = (array) => {
-      for (let i = array.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    };
+    const createCards = async () => {
+      await axios
+        .get(`https://picsum.photos/v2/list?limit=${couplesCount.value * 2}`)
+        .then((response) => {
+          arrayAPIimages.value = response.data.map((img) => {
+            return img.download_url;
+          });
 
     const createCards = () => {
       cards.value = [];
-      for (let index = 0; index < couplesCount.value; index++) {
+          for (
+            let index = 0;
+            index < arrayAPIimages.value.length / 2;
+            index++
+          ) {
         const card = {
           text: index,
           isFlipped: false,
           isHidden: false,
+              img: arrayAPIimages.value[index],
         };
         cards.value.push(card);
         const card2 = {
           text: index,
           isFlipped: false,
           isHidden: false,
+              img: arrayAPIimages.value[index],
         };
         cards.value.push(card2);
       }
