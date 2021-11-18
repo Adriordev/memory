@@ -76,12 +76,7 @@ export default {
         flippedCards.forEach((element) => {
           element.isHidden = true;
         });
-        setTimeout(() => {
-          flippedCards.forEach((element) => {
-            element.isFlipped = false;
-          });
-        }, 2000);
-      } else {
+      }
         setTimeout(() => {
           flippedCards.forEach((element) => {
             element.isFlipped = false;
