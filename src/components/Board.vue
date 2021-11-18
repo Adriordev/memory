@@ -27,37 +27,34 @@ export default {
   setup() {
     const couplesCount = ref();
     const cards = ref([]);
-    const arrayAPIimages = ref([]);
 
     const createCards = async () => {
-      await axios
-        .get(`https://picsum.photos/v2/list?limit=${couplesCount.value}`)
-        .then((response) => {
-          arrayAPIimages.value = response.data.map((img) => {
-            return img.download_url;
-          });
+      cards.value = [];
 
-          cards.value = [];
-          for (let index = 0; index < arrayAPIimages.value.length; index++) {
-            const card = {
-              text: index,
-              isFlipped: false,
-              isHidden: false,
-              img: arrayAPIimages.value[index],
-            };
-            cards.value.push(card);
-            const card2 = {
-              text: index,
-              isFlipped: false,
-              isHidden: false,
-              img: arrayAPIimages.value[index],
-            };
-            cards.value.push(card2);
-          }
-          shuffle(cards.value);
-          cards.value.map((e, index) => [...cards.value, (e.id = index)]);
-          console.log("cards.value :>> ", cards.value);
-        });
+      const response = await axios.get(
+        `https://picsum.photos/v2/list?limit=${couplesCount.value}`
+      );
+      const images = response.data.map((img) => img.download_url);
+
+      for (let index = 0; index < images.length; index++) {
+        const card = {
+          text: index,
+          isFlipped: false,
+          isHidden: false,
+          img: images[index],
+        };
+        cards.value.push(card);
+        const card2 = {
+          text: index,
+          isFlipped: false,
+          isHidden: false,
+          img: images[index],
+        };
+        cards.value.push(card2);
+      }
+      shuffle(cards.value);
+      cards.value.map((e, index) => [...cards.value, (e.id = index)]);
+      console.log("cards.value :>> ", cards.value);
     };
 
     const flipCard = (id) => {
