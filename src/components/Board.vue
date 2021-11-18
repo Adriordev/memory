@@ -9,8 +9,8 @@
     <Card
       v-bind="item"
       @handleFlip="flipCard"
-      v-for="(item, index) in cards"
-      :key="index"
+      v-for="item in cards"
+      :key="item.id"
     />
   </div>
 </template>
@@ -23,6 +23,7 @@ export default {
   components: {
     Card,
   },
+
   setup() {
     const couplesCount = ref();
     const cards = ref([]);
@@ -30,37 +31,33 @@ export default {
 
     const createCards = async () => {
       await axios
-        .get(`https://picsum.photos/v2/list?limit=${couplesCount.value * 2}`)
+        .get(`https://picsum.photos/v2/list?limit=${couplesCount.value}`)
         .then((response) => {
           arrayAPIimages.value = response.data.map((img) => {
             return img.download_url;
           });
 
-    const createCards = () => {
-      cards.value = [];
-          for (
-            let index = 0;
-            index < arrayAPIimages.value.length / 2;
-            index++
-          ) {
-        const card = {
-          text: index,
-          isFlipped: false,
-          isHidden: false,
+          cards.value = [];
+          for (let index = 0; index < arrayAPIimages.value.length; index++) {
+            const card = {
+              text: index,
+              isFlipped: false,
+              isHidden: false,
               img: arrayAPIimages.value[index],
-        };
-        cards.value.push(card);
-        const card2 = {
-          text: index,
-          isFlipped: false,
-          isHidden: false,
+            };
+            cards.value.push(card);
+            const card2 = {
+              text: index,
+              isFlipped: false,
+              isHidden: false,
               img: arrayAPIimages.value[index],
-        };
-        cards.value.push(card2);
-      }
-      shuffle(cards.value);
-      cards.value.map((e, index) => [...cards.value, (e.id = index)]);
-      console.log("cards.value :>> ", cards.value);
+            };
+            cards.value.push(card2);
+          }
+          shuffle(cards.value);
+          cards.value.map((e, index) => [...cards.value, (e.id = index)]);
+          console.log("cards.value :>> ", cards.value);
+        });
     };
 
     const flipCard = (id) => {
@@ -85,12 +82,19 @@ export default {
           element.isHidden = true;
         });
       }
-        setTimeout(() => {
-          flippedCards.forEach((element) => {
-            element.isFlipped = false;
-          });
-        }, 2000);
+      setTimeout(() => {
+        flippedCards.forEach((element) => {
+          element.isFlipped = false;
+        });
+      }, 2000);
+    };
+
+    const shuffle = (array) => {
+      for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
       }
+      return array;
     };
 
     return {

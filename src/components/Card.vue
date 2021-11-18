@@ -3,7 +3,7 @@
     <div class="card" :class="{ 'is-flipped': isFlipped }" @click="handleFlip">
       <div class="card__face card__face--front">MEMORY</div>
       <div class="card__face card__face--back">
-        {{ text }}
+        <img :src="img" :alt="img" />
       </div>
     </div>
   </div>
@@ -27,6 +27,9 @@ export default {
     id: {
       type: Number,
     },
+    img: {
+      type: String,
+    },
   },
   emits: ["handleFlip"],
 
@@ -45,7 +48,7 @@ export default {
 <style>
 .scene {
   width: 21%;
-  height: 260px;
+  height: 140px;
   border: 1px solid #ccc;
   /* margin: 40px 0; */
   perspective: 600px;
@@ -72,7 +75,7 @@ export default {
   position: absolute;
   width: 100%;
   height: 100%;
-  line-height: 260px;
+  line-height: 140px;
   color: white;
   text-align: center;
   font-weight: bold;
@@ -85,7 +88,14 @@ export default {
 }
 
 .card__face--back {
-  background: coral;
+  background: white;
   transform: rotateY(180deg);
+}
+img {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 </style>
