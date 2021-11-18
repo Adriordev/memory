@@ -37,23 +37,25 @@ export default {
       const images = response.data.map((img) => img.download_url);
 
       for (let index = 0; index < images.length; index++) {
-        const card = {
+        const cardA = {
+          id: `${index}A`,
           text: index,
           isFlipped: false,
           isHidden: false,
           img: images[index],
         };
-        cards.value.push(card);
-        const card2 = {
+        cards.value.push(cardA);
+
+        const cardB = {
+          id: `${index}B`,
           text: index,
           isFlipped: false,
           isHidden: false,
           img: images[index],
         };
-        cards.value.push(card2);
+        cards.value.push(cardB);
       }
       shuffle(cards.value);
-      cards.value.map((e, index) => [...cards.value, (e.id = index)]);
       console.log("cards.value :>> ", cards.value);
     };
 
@@ -63,7 +65,7 @@ export default {
       ).length;
 
       if (flippedCardsCount < 2) {
-        const selectCardtoFlip = cards.value[id];
+        const selectCardtoFlip = cards.value.find((c) => c.id === id);
         selectCardtoFlip.isFlipped = true;
       }
 

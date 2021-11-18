@@ -25,7 +25,7 @@ export default {
       default: false,
     },
     id: {
-      type: Number,
+      type: String,
     },
     img: {
       type: String,
