@@ -13,7 +13,8 @@
     <h3>Cartas ganadas jugador: {{ counter.human }}</h3>
     <h3>Cartas ganadas maquina: {{ counter.computer }}</h3>
   </div>
-  <div class="board-container">
+
+  <div class="board-container" :class="{ 'not-pointer': notPointer }">
     <Card
       v-bind="item"
       @handleFlip="flipCard"
@@ -36,10 +37,12 @@ export default {
     const couplesCount = ref();
     const cards = ref([]);
     const counter = ref([]);
+    const notPointer = ref(false);
 
     const createCards = async () => {
       cards.value = [];
       counter.value = { human: 0, computer: 0 };
+      notPointer.value = false;
       const response = await axios.get(
         `https://picsum.photos/v2/list?limit=${couplesCount.value}`
       );
@@ -104,12 +107,39 @@ export default {
           element.isFlipped = false;
         });
       }, 2000);
+      notPointer.value = !notPointer.value;
+      if (notPointer.value === true) {
+        turnComputer();
+      }
     };
 
-    const shuffle = (array) => {
-      for (let i = array.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+    const turnComputer = async () => {
+      await sleep(3000);
+      const possibleCards = cards.value.filter((card) => {
+        return card.isHidden === false;
+      });
+      if (possibleCards.length === 0) return;
+
+      const rollcard1 =
+        Math.floor(Math.random() * (possibleCards.length - 0)) + 0;
+      const playCard1 = possibleCards[rollcard1];
+
+      possibleCards.splice(rollcard1, 1);
+
+      const rollcard2 =
+        Math.floor(Math.random() * (possibleCards.length - 0)) + 0;
+      const playCard2 = possibleCards[rollcard2];
+
+      console.log(playCard1, playCard2);
+      flipCard(playCard1.id);
+      await sleep(1000);
+      flipCard(playCard2.id);
+    };
+
+    function sleep(ms) {
+      return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+      });
       }
       return array;
     };
@@ -122,6 +152,8 @@ export default {
       Card,
       counter,
       visible: ref(false),
+      turnComputer,
+      notPointer,
     };
   },
 };
@@ -139,5 +171,8 @@ export default {
   justify-content: center;
   margin: 0px 100px 0px 100px;
   gap: 5px 5px;
+}
+.board-container.not-pointer {
+  pointer-events: none;
 }
 </style>
