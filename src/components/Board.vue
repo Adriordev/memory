@@ -3,7 +3,10 @@
     <h3>Board</h3>
     <label for="couplesCount">Numero de parejas: </label>
     <input type="number" v-model="couplesCount" @keyup.enter="createCards" />
-    <button @click="createCards">crear</button>
+    <button @click="createCards((visible = true))">crear</button>
+  </div>
+  <div v-if="visible === true">
+    <h3>Cartas ganadas: {{ counter }}</h3>
   </div>
   <div class="board-container">
     <Card
@@ -27,9 +30,11 @@ export default {
   setup() {
     const couplesCount = ref();
     const cards = ref([]);
+    const counter = ref(0);
 
     const createCards = async () => {
       cards.value = [];
+      counter.value = 0;
 
       const response = await axios.get(
         `https://picsum.photos/v2/list?limit=${couplesCount.value}`
@@ -76,7 +81,12 @@ export default {
       const flippedCards = cards.value.filter((card) => card.isFlipped);
       if (flippedCards.length < 2) return;
 
-      if (flippedCards[0].text === flippedCards[1].text) {
+        if (
+          flippedCards[0].isHidden === false &&
+          flippedCards[1].isHidden === false
+        ) {
+          counter.value += 1;
+        }
         flippedCards.forEach((element) => {
           element.isHidden = true;
         });
@@ -102,6 +112,8 @@ export default {
       createCards,
       flipCard,
       Card,
+      counter,
+      visible: ref(false),
     };
   },
 };
