@@ -2,11 +2,16 @@
   <div class="generate-board">
     <h3>Board</h3>
     <label for="couplesCount">Numero de parejas: </label>
-    <input type="number" v-model="couplesCount" @keyup.enter="createCards" />
+    <input
+      type="number"
+      v-model="couplesCount"
+      @keyup.enter="createCards((visible = true))"
+    />
     <button @click="createCards((visible = true))">crear</button>
   </div>
   <div v-if="visible === true">
-    <h3>Cartas ganadas: {{ counter }}</h3>
+    <h3>Cartas ganadas jugador: {{ counter.human }}</h3>
+    <h3>Cartas ganadas maquina: {{ counter.computer }}</h3>
   </div>
   <div class="board-container">
     <Card
@@ -30,12 +35,11 @@ export default {
   setup() {
     const couplesCount = ref();
     const cards = ref([]);
-    const counter = ref(0);
+    const counter = ref([]);
 
     const createCards = async () => {
       cards.value = [];
-      counter.value = 0;
-
+      counter.value = { human: 0, computer: 0 };
       const response = await axios.get(
         `https://picsum.photos/v2/list?limit=${couplesCount.value}`
       );
@@ -81,11 +85,15 @@ export default {
       const flippedCards = cards.value.filter((card) => card.isFlipped);
       if (flippedCards.length < 2) return;
 
+      if (flippedCards[0].img === flippedCards[1].img) {
         if (
           flippedCards[0].isHidden === false &&
-          flippedCards[1].isHidden === false
+          flippedCards[1].isHidden === false &&
+          notPointer.value === false
         ) {
-          counter.value += 1;
+          counter.value.human += 1;
+        } else {
+          counter.value.computer += 1;
         }
         flippedCards.forEach((element) => {
           element.isHidden = true;
