@@ -10,10 +10,7 @@
     <h3>Cartas ganadas maquina: {{ score.computer }}</h3>
   </div>
 
-  <div
-    class="board-container"
-    :class="{ 'not-pointer': turnSelector.notPointer }"
-  >
+  <div class="board-container" :class="{ 'not-pointer': userCannotFlipCard }">
     <Card
       v-bind="card"
       @handleFlip="flipCard"
@@ -24,7 +21,7 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import Card from "./Card.vue";
 import axios from "axios";
 export default {
@@ -33,17 +30,25 @@ export default {
   },
 
   setup() {
+    // State
     const couplesCount = ref();
     const cards = ref([]);
     //depende del modo de juego que queramos crear, si es por rondas o por juegos independientes
     const score = ref({ human: 0, computer: 0 });
-    const turnSelector = ref({ notPointer: false, turnComputer: false });
+    const turnComputer = ref(false);
     const isScoreVisible = ref(false);
 
+    // Computed
+    const flippedCards = computed(() => cards.value.filter((c) => c.isFlipped));
+    const userCannotFlipCard = computed(
+      () => turnComputer.value || flippedCards.value.length == 2
+    );
+
+    //Functions
     const createCards = async () => {
       cards.value = [];
       score.value = { human: 0, computer: 0 };
-      turnSelector.value = { notPointer: false, turnComputer: false };
+      turnComputer.value = false;
       isScoreVisible.value = true;
 
       const response = await axios.get(
@@ -88,36 +93,31 @@ export default {
     };
 
     const checkIfCoupleWasFound = async () => {
-      const flippedCards = cards.value.filter((card) => card.isFlipped);
+      if (flippedCards.value.length < 2) return;
 
-      if (flippedCards.length < 2) return;
-
-      turnSelector.value.notPointer = true;
-
-      const coupleFound = flippedCards[0].img === flippedCards[1].img;
+      const coupleFound =
+        flippedCards.value[0].img === flippedCards.value[1].img;
       if (coupleFound) {
-        if (turnSelector.value.turnComputer) {
+        if (turnComputer.value) {
           score.value.computer += 1;
         } else {
           score.value.human += 1;
         }
-        flippedCards.forEach((element) => {
+        flippedCards.value.forEach((element) => {
           element.isHidden = true;
         });
       } else {
-        turnSelector.value.turnComputer = !turnSelector.value.turnComputer;
+        turnComputer.value = !turnComputer.value;
       }
 
       await sleep(2000);
 
-      flippedCards.forEach((element) => {
+      flippedCards.value.forEach((element) => {
         element.isFlipped = false;
       });
 
-      if (turnSelector.value.turnComputer) {
+      if (turnComputer.value) {
         computerPlayGame();
-      } else {
-        turnSelector.value.notPointer = false;
       }
     };
 
@@ -152,8 +152,9 @@ export default {
       Card,
       score,
       computerPlayGame,
-      turnSelector,
+      turnComputer,
       isScoreVisible,
+      userCannotFlipCard,
     };
   },
 };
