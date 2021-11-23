@@ -5,7 +5,7 @@
     <input type="number" v-model="couplesCount" @keyup.enter="createCards" />
     <button @click="createCards">crear</button>
   </div>
-  <div v-if="isScoreVisible">
+  <div v-if="score">
     <h3>Cartas ganadas jugador: {{ score.human }}</h3>
     <h3>Cartas ganadas maquina: {{ score.computer }}</h3>
   </div>
@@ -33,10 +33,8 @@ export default {
     // State
     const couplesCount = ref();
     const cards = ref([]);
-    //depende del modo de juego que queramos crear, si es por rondas o por juegos independientes
-    const score = ref({ human: 0, computer: 0 });
+    const score = ref(); //depende del modo de juego que queramos crear, si es por rondas o por juegos independientes
     const turnComputer = ref(false);
-    const isScoreVisible = ref(false);
 
     // Computed
     const flippedCards = computed(() => cards.value.filter((c) => c.isFlipped));
@@ -49,7 +47,6 @@ export default {
       cards.value = [];
       score.value = { human: 0, computer: 0 };
       turnComputer.value = false;
-      isScoreVisible.value = true;
 
       const response = await axios.get(
         `https://picsum.photos/v2/list?limit=${couplesCount.value}`
@@ -153,7 +150,6 @@ export default {
       score,
       computerPlayGame,
       turnComputer,
-      isScoreVisible,
       userCannotFlipCard,
     };
   },
