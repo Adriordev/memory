@@ -80,51 +80,45 @@ export default {
       }
     };
 
-    const flipCard = (id) => {
+    const flipCard = async (id) => {
       const selectCardtoFlip = cards.value.find((c) => c.id === id);
       selectCardtoFlip.isFlipped = true;
 
-      checkIfCoupleWasFound();
+      await checkIfCoupleWasFound();
     };
 
-    const checkIfCoupleWasFound = () => {
+    const checkIfCoupleWasFound = async () => {
       const flippedCards = cards.value.filter((card) => card.isFlipped);
 
       if (flippedCards.length < 2) return;
 
       turnSelector.value.notPointer = true;
-      if (flippedCards[0].img === flippedCards[1].img) {
+
+      const coupleFound = flippedCards[0].img === flippedCards[1].img;
+      if (coupleFound) {
         if (turnSelector.value.turnComputer) {
           score.value.computer += 1;
-          turnSelector.value.turnComputer = !turnSelector.value.turnComputer;
         } else {
           score.value.human += 1;
-          turnSelector.value.turnComputer = !turnSelector.value.turnComputer;
         }
         flippedCards.forEach((element) => {
           element.isHidden = true;
         });
+      } else {
+        turnSelector.value.turnComputer = !turnSelector.value.turnComputer;
       }
-      turnSelector.value.turnComputer = !turnSelector.value.turnComputer;
-      flipSelectedCards(2000, flippedCards, turnSelector);
-    };
 
-    const flipSelectedCards = (ms, flippedCards, changeTurn) => {
-      new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(
-            flippedCards.forEach((element) => {
-              element.isFlipped = false;
-            })
-          );
+      await sleep(2000);
 
-          if (changeTurn.value.turnComputer) {
-            computerPlayGame();
-          } else {
-            changeTurn.value.notPointer = false;
-          }
-        }, ms);
+      flippedCards.forEach((element) => {
+        element.isFlipped = false;
       });
+
+      if (turnSelector.value.turnComputer) {
+        computerPlayGame();
+      } else {
+        turnSelector.value.notPointer = false;
+      }
     };
 
     const computerPlayGame = async () => {
