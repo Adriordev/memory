@@ -2,16 +2,12 @@
   <div class="generate-board">
     <h3>Board</h3>
     <label for="couplesCount">Numero de parejas: </label>
-    <input
-      type="number"
-      v-model="couplesCount"
-      @keyup.enter="createCards((visible = true))"
-    />
-    <button @click="createCards((visible = true))">crear</button>
+    <input type="number" v-model="couplesCount" @keyup.enter="createCards" />
+    <button @click="createCards">crear</button>
   </div>
-  <div v-if="visible === true">
-    <h3>Cartas ganadas jugador: {{ counter.human }}</h3>
-    <h3>Cartas ganadas maquina: {{ counter.computer }}</h3>
+  <div v-if="isScoreVisible">
+    <h3>Cartas ganadas jugador: {{ score.human }}</h3>
+    <h3>Cartas ganadas maquina: {{ score.computer }}</h3>
   </div>
 
   <div
@@ -19,10 +15,10 @@
     :class="{ 'not-pointer': turnSelector.notPointer }"
   >
     <Card
-      v-bind="item"
+      v-bind="card"
       @handleFlip="flipCard"
-      v-for="item in cards"
-      :key="item.id"
+      v-for="card in cards"
+      :key="card.id"
     />
   </div>
 </template>
@@ -40,13 +36,15 @@ export default {
     const couplesCount = ref();
     const cards = ref([]);
     //depende del modo de juego que queramos crear, si es por rondas o por juegos independientes
-    const counter = ref({ human: 0, computer: 0 });
+    const score = ref({ human: 0, computer: 0 });
     const turnSelector = ref({ notPointer: false, turnComputer: false });
+    const isScoreVisible = ref(false);
 
     const createCards = async () => {
       cards.value = [];
-      counter.value = { human: 0, computer: 0 };
+      score.value = { human: 0, computer: 0 };
       turnSelector.value = { notPointer: false, turnComputer: false };
+      isScoreVisible.value = true;
 
       const response = await axios.get(
         `https://picsum.photos/v2/list?limit=${couplesCount.value}`
@@ -91,14 +89,16 @@ export default {
 
     const checkIfCoupleWasFound = () => {
       const flippedCards = cards.value.filter((card) => card.isFlipped);
+
       if (flippedCards.length < 2) return;
+
       turnSelector.value.notPointer = true;
       if (flippedCards[0].img === flippedCards[1].img) {
-        if (turnSelector.value.turnComputer === true) {
-          counter.value.computer += 1;
+        if (turnSelector.value.turnComputer) {
+          score.value.computer += 1;
           turnSelector.value.turnComputer = !turnSelector.value.turnComputer;
         } else {
-          counter.value.human += 1;
+          score.value.human += 1;
           turnSelector.value.turnComputer = !turnSelector.value.turnComputer;
         }
         flippedCards.forEach((element) => {
@@ -117,8 +117,8 @@ export default {
               element.isFlipped = false;
             })
           );
-          console.log("changeTurn.value :>> ", changeTurn.value);
-          if (changeTurn.value.turnComputer === true) {
+
+          if (changeTurn.value.turnComputer) {
             computerPlayGame();
           } else {
             changeTurn.value.notPointer = false;
@@ -129,15 +129,13 @@ export default {
 
     const computerPlayGame = async () => {
       await sleep(2000);
-      const possibleCards = cards.value.filter((card) => {
-        return card.isHidden === false;
-      });
+      const possibleCards = cards.value.filter((card) => !card.isHidden);
       if (possibleCards.length === 0) return;
 
       for (let index = 0; index < 2; index++) {
-        const rolled = rollCard(possibleCards);
-        flipCard(possibleCards[rolled].id);
-        possibleCards.splice(rolled, 1);
+        const randomCardIndex = getRandomIndex(possibleCards);
+        flipCard(possibleCards[randomCardIndex].id);
+        possibleCards.splice(randomCardIndex, 1);
         await sleep(500);
       }
     };
@@ -148,8 +146,8 @@ export default {
       });
     }
 
-    const rollCard = (possibleCards) => {
-      return Math.floor(Math.random() * (possibleCards.length - 0)) + 0;
+    const getRandomIndex = (array) => {
+      return Math.floor(Math.random() * (array.length - 0)) + 0;
     };
 
     return {
@@ -158,10 +156,10 @@ export default {
       createCards,
       flipCard,
       Card,
-      counter,
-      visible: ref(false),
+      score,
       computerPlayGame,
       turnSelector,
+      isScoreVisible,
     };
   },
 };
