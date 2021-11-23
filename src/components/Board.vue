@@ -39,6 +39,7 @@ export default {
   setup() {
     const couplesCount = ref();
     const cards = ref([]);
+    //depende del modo de juego que queramos crear, si es por rondas o por juegos independientes
     const counter = ref({ human: 0, computer: 0 });
     const turnSelector = ref({ notPointer: false, turnComputer: false });
 
@@ -72,12 +73,18 @@ export default {
         cards.value.push(cardB);
       }
       shuffle(cards.value);
-      console.log("cards.value :>> ", cards.value);
+    };
+
+    const shuffle = (array) => {
+      for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
     };
 
     const flipCard = (id) => {
-        const selectCardtoFlip = cards.value.find((c) => c.id === id);
-        selectCardtoFlip.isFlipped = true;
+      const selectCardtoFlip = cards.value.find((c) => c.id === id);
+      selectCardtoFlip.isFlipped = true;
 
       checkIfCoupleWasFound();
     };
@@ -89,8 +96,10 @@ export default {
       if (flippedCards[0].img === flippedCards[1].img) {
         if (turnSelector.value.turnComputer === true) {
           counter.value.computer += 1;
+          turnSelector.value.turnComputer = !turnSelector.value.turnComputer;
         } else {
           counter.value.human += 1;
+          turnSelector.value.turnComputer = !turnSelector.value.turnComputer;
         }
         flippedCards.forEach((element) => {
           element.isHidden = true;
@@ -98,21 +107,6 @@ export default {
       }
       turnSelector.value.turnComputer = !turnSelector.value.turnComputer;
       flipSelectedCards(2000, flippedCards, turnSelector);
-    };
-
-    const computerPlayGame = async () => {
-      await sleep(2000);
-      const possibleCards = cards.value.filter((card) => {
-        return card.isHidden === false;
-      });
-      if (possibleCards.length === 0) return;
-
-      for (let index = 0; index < 2; index++) {
-        const rolled = rollCard(possibleCards);
-        flipCard(possibleCards[rolled].id);
-        possibleCards.splice(rolled, 1);
-        await sleep(500);
-      }
     };
 
     const flipSelectedCards = (ms, flippedCards, changeTurn) => {
@@ -133,11 +127,26 @@ export default {
       });
     };
 
+    const computerPlayGame = async () => {
+      await sleep(2000);
+      const possibleCards = cards.value.filter((card) => {
+        return card.isHidden === false;
+      });
+      if (possibleCards.length === 0) return;
+
+      for (let index = 0; index < 2; index++) {
+        const rolled = rollCard(possibleCards);
+        flipCard(possibleCards[rolled].id);
+        possibleCards.splice(rolled, 1);
+        await sleep(500);
+      }
+    };
+
     function sleep(ms) {
       return new Promise((resolve) => {
         setTimeout(resolve, ms);
       });
-      }
+    }
 
     const rollCard = (possibleCards) => {
       return Math.floor(Math.random() * (possibleCards.length - 0)) + 0;
