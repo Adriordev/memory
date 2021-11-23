@@ -14,7 +14,10 @@
     <h3>Cartas ganadas maquina: {{ counter.computer }}</h3>
   </div>
 
-  <div class="board-container" :class="{ 'not-pointer': notPointer }">
+  <div
+    class="board-container"
+    :class="{ 'not-pointer': turnSelector.notPointer }"
+  >
     <Card
       v-bind="item"
       @handleFlip="flipCard"
@@ -36,13 +39,14 @@ export default {
   setup() {
     const couplesCount = ref();
     const cards = ref([]);
-    const counter = ref([]);
-    const notPointer = ref(false);
+    const counter = ref({ human: 0, computer: 0 });
+    const turnSelector = ref({ notPointer: false, turnComputer: false });
 
     const createCards = async () => {
       cards.value = [];
       counter.value = { human: 0, computer: 0 };
-      notPointer.value = false;
+      turnSelector.value = { notPointer: false, turnComputer: false };
+
       const response = await axios.get(
         `https://picsum.photos/v2/list?limit=${couplesCount.value}`
       );
@@ -72,14 +76,8 @@ export default {
     };
 
     const flipCard = (id) => {
-      const flippedCardsCount = cards.value.filter(
-        (card) => card.isFlipped
-      ).length;
-
-      if (flippedCardsCount < 2) {
         const selectCardtoFlip = cards.value.find((c) => c.id === id);
         selectCardtoFlip.isFlipped = true;
-      }
 
       checkIfCoupleWasFound();
     };
@@ -87,53 +85,52 @@ export default {
     const checkIfCoupleWasFound = () => {
       const flippedCards = cards.value.filter((card) => card.isFlipped);
       if (flippedCards.length < 2) return;
-
+      turnSelector.value.notPointer = true;
       if (flippedCards[0].img === flippedCards[1].img) {
-        if (
-          flippedCards[0].isHidden === false &&
-          flippedCards[1].isHidden === false &&
-          notPointer.value === false
-        ) {
-          counter.value.human += 1;
-        } else {
+        if (turnSelector.value.turnComputer === true) {
           counter.value.computer += 1;
+        } else {
+          counter.value.human += 1;
         }
         flippedCards.forEach((element) => {
           element.isHidden = true;
         });
       }
-      setTimeout(() => {
-        flippedCards.forEach((element) => {
-          element.isFlipped = false;
-        });
-      }, 2000);
-      notPointer.value = !notPointer.value;
-      if (notPointer.value === true) {
-        turnComputer();
-      }
+      turnSelector.value.turnComputer = !turnSelector.value.turnComputer;
+      flipSelectedCards(2000, flippedCards, turnSelector);
     };
 
-    const turnComputer = async () => {
-      await sleep(3000);
+    const computerPlayGame = async () => {
+      await sleep(2000);
       const possibleCards = cards.value.filter((card) => {
         return card.isHidden === false;
       });
       if (possibleCards.length === 0) return;
 
-      const rollcard1 =
-        Math.floor(Math.random() * (possibleCards.length - 0)) + 0;
-      const playCard1 = possibleCards[rollcard1];
+      for (let index = 0; index < 2; index++) {
+        const rolled = rollCard(possibleCards);
+        flipCard(possibleCards[rolled].id);
+        possibleCards.splice(rolled, 1);
+        await sleep(500);
+      }
+    };
 
-      possibleCards.splice(rollcard1, 1);
-
-      const rollcard2 =
-        Math.floor(Math.random() * (possibleCards.length - 0)) + 0;
-      const playCard2 = possibleCards[rollcard2];
-
-      console.log(playCard1, playCard2);
-      flipCard(playCard1.id);
-      await sleep(1000);
-      flipCard(playCard2.id);
+    const flipSelectedCards = (ms, flippedCards, changeTurn) => {
+      new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(
+            flippedCards.forEach((element) => {
+              element.isFlipped = false;
+            })
+          );
+          console.log("changeTurn.value :>> ", changeTurn.value);
+          if (changeTurn.value.turnComputer === true) {
+            computerPlayGame();
+          } else {
+            changeTurn.value.notPointer = false;
+          }
+        }, ms);
+      });
     };
 
     function sleep(ms) {
@@ -141,7 +138,9 @@ export default {
         setTimeout(resolve, ms);
       });
       }
-      return array;
+
+    const rollCard = (possibleCards) => {
+      return Math.floor(Math.random() * (possibleCards.length - 0)) + 0;
     };
 
     return {
@@ -152,8 +151,8 @@ export default {
       Card,
       counter,
       visible: ref(false),
-      turnComputer,
-      notPointer,
+      computerPlayGame,
+      turnSelector,
     };
   },
 };
@@ -174,5 +173,6 @@ export default {
 }
 .board-container.not-pointer {
   pointer-events: none;
+  cursor: not-allowed;
 }
 </style>
