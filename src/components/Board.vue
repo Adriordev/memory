@@ -22,6 +22,8 @@
 
 <script>
 import { ref, computed } from "vue";
+import { shuffle, getRandomIndex } from "../helpers/arrayHelpers";
+import { sleep } from "../helpers/sleepHelper";
 import Card from "./Card.vue";
 import axios from "axios";
 export default {
@@ -75,13 +77,6 @@ export default {
       shuffle(cards.value);
     };
 
-    const shuffle = (array) => {
-      for (let i = array.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-    };
-
     const flipCard = async (id) => {
       const selectCardtoFlip = cards.value.find((c) => c.id === id);
       selectCardtoFlip.isFlipped = true;
@@ -129,16 +124,6 @@ export default {
         possibleCards.splice(randomCardIndex, 1);
         await sleep(500);
       }
-    };
-
-    function sleep(ms) {
-      return new Promise((resolve) => {
-        setTimeout(resolve, ms);
-      });
-    }
-
-    const getRandomIndex = (array) => {
-      return Math.floor(Math.random() * (array.length - 0)) + 0;
     };
 
     return {
