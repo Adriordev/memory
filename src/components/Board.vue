@@ -6,8 +6,7 @@
     <button @click="createCards">crear</button>
   </div>
   <div v-if="score">
-    <h3>Cartas ganadas jugador: {{ score.human }}</h3>
-    <h3>Cartas ganadas maquina: {{ score.computer }}</h3>
+    <Score v-bind="score" />
   </div>
 
   <div class="board-container" :class="{ 'not-pointer': userCannotFlipCard }">
@@ -26,9 +25,11 @@ import { shuffle, getRandomIndex } from "../helpers/arrayHelpers";
 import { sleep } from "../helpers/sleepHelper";
 import Card from "./Card.vue";
 import axios from "axios";
+import Score from "./Score.vue";
 export default {
   components: {
     Card,
+    Score,
   },
 
   setup() {
@@ -133,6 +134,7 @@ export default {
       flipCard,
       Card,
       score,
+      Score,
       computerPlayGame,
       turnComputer,
       userCannotFlipCard,
