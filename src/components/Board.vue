@@ -23,11 +23,12 @@
     <br />
     <button @click="createCards">crear</button>
   </div>
-  <div v-if="score">
-    <Score v-bind="score" />
-  </div>
+  <span v-if="score">
+    <Score v-bind="score" :endGame="endGame" />
+  </span>
+
   <div
-    v-if="endGame === false"
+    v-if="!endGame"
     class="board-container"
     :class="{ 'not-pointer': userCannotFlipCard }"
   >
@@ -37,9 +38,6 @@
       v-for="card in cards"
       :key="card.id"
     />
-  </div>
-  <div v-if="endGame === true">
-    <h3>La partida ha fianlizado.</h3>
   </div>
 </template>
 
