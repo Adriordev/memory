@@ -1,17 +1,24 @@
 <template>
-  <div v-if="!endGame">
-    <h3>Cartas ganadas jugador: {{ human }}</h3>
-    <h3>Cartas ganadas maquina: {{ computer }}</h3>
+  <div class="score" v-if="!endGame">
+    <div class="player-score">
+      <h3>Win player cards: {{ player }}</h3>
+    </div>
+    <div class="computer-score">
+      <h3>Win computer cards: {{ computer }}</h3>
+    </div>
   </div>
   <div v-else>
-    <h2 v-if="human >= computer">HAS GANADO ({{ human }} - {{ computer }})</h2>
-    <h2 v-else>TE HAN GANADO ({{ human }} - {{ computer }})</h2>
+    <h2 v-if="player > computer">YOU WIN ({{ player }} - {{ computer }})</h2>
+    <h2 v-else-if="player < computer">
+      COMPUTER WINS ({{ player }} - {{ computer }})
+    </h2>
+    <h2 v-else>DRAW</h2>
   </div>
 </template>
 <script>
 export default {
   props: {
-    human: { type: Number },
+    player: { type: Number },
     computer: { type: Number },
     endGame: { type: Boolean },
   },
@@ -20,4 +27,17 @@ export default {
   },
 };
 </script>
-<style></style>
+<style>
+.score {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(50%, 1fr));
+  align-items: start;
+  justify-content: space-around;
+  min-height: 150px;
+  margin-bottom: 5px;
+}
+.player-score,
+.computer-score {
+  padding: 5px;
+}
+</style>

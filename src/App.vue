@@ -1,9 +1,11 @@
 <template>
+  <h1>MEMORY GAME</h1>
   <Board />
 </template>
 
 <script>
 import Board from "./components/Board.vue";
+
 export default {
   name: "App",
   components: {

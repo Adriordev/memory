@@ -1,7 +1,7 @@
 <template>
-  <div class="generate-board">
-    <h3>Board</h3>
-    <label for="couplesCount">Numero de parejas: </label>
+  <div class="generate-board" v-if="!score || endGame">
+    <label for="couplesCount">Numer of couples</label>
+    <br />
     <input type="number" v-model="couplesCount" @keyup.enter="createCards" />
     <br />
     <br />
@@ -21,23 +21,20 @@
     />
     <br />
     <br />
-    <button @click="createCards">crear</button>
+    <button @click="createCards">Create</button>
   </div>
   <span v-if="score">
     <Score v-bind="score" :endGame="endGame" />
   </span>
-
-  <div
-    v-if="!endGame"
-    class="board-container"
-    :class="{ 'not-pointer': userCannotFlipCard }"
-  >
+  <div v-if="!endGame">
+    <div class="board-container" :class="{ 'not-pointer': userCannotFlipCard }">
     <Card
       v-bind="card"
       @handleFlip="flipCard"
       v-for="card in cards"
       :key="card.id"
     />
+  </div>
   </div>
 </template>
 
@@ -74,7 +71,10 @@ export default {
     //Functions
     const createCards = async () => {
       cards.value = [];
-      score.value = { human: 0, computer: 0 };
+      score.value = {
+        player: 0,
+        computer: 0,
+      };
       turnComputer.value = false;
       cardsShown.value = [];
       endGame.value = false;
@@ -126,7 +126,7 @@ export default {
         if (turnComputer.value) {
           score.value.computer += 1;
         } else {
-          score.value.human += 1;
+          score.value.player += 1;
         }
         flippedCards.value.forEach((element) => {
           element.isHidden = true;
@@ -202,16 +202,15 @@ export default {
 
 <style>
 .generate-board {
-  text-align: center;
   padding: 15px 0px 15px 0px;
-  margin: 0 auto;
 }
 .board-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: 0px 100px 0px 100px;
-  gap: 5px 5px;
+  border: 2px solid fuchsia;
+  display: grid;
+  grid-gap: 5px;
+  grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
+  margin: 1em;
+  padding: 1em;
 }
 .board-container.not-pointer {
   pointer-events: none;

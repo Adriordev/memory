@@ -43,10 +43,8 @@ export default {
 
 <style>
 .scene {
-  width: 21%;
-  height: 140px;
-  border: 1px solid #ccc;
-  /* margin: 40px 0; */
+  width: 100%;
+  height: 240px;
   perspective: 600px;
 }
 .card {
@@ -71,7 +69,7 @@ export default {
   position: absolute;
   width: 100%;
   height: 100%;
-  line-height: 140px;
+  line-height: 420px;
   color: white;
   text-align: center;
   font-weight: bold;
@@ -80,18 +78,22 @@ export default {
 }
 
 .card__face--front {
-  background: aqua;
+  background-image: url("https://image.freepik.com/free-vector/flash-drive_53876-37485.jpg");
+  background-position: center;
+  background-position-y: 55%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 2%;
 }
 
 .card__face--back {
-  background: white;
   transform: rotateY(180deg);
 }
 img {
   position: relative;
-
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  width: inherit;
+  height: inherit;
+  object-fit: cover;
+  border-radius: 2%;
 }
 </style>
