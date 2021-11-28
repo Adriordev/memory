@@ -28,13 +28,13 @@
   </span>
   <div v-if="!endGame">
     <div class="board-container" :class="{ 'not-pointer': userCannotFlipCard }">
-    <Card
-      v-bind="card"
-      @handleFlip="flipCard"
-      v-for="card in cards"
-      :key="card.id"
-    />
-  </div>
+      <Card
+        v-bind="card"
+        @handleFlip="flipCard"
+        v-for="card in cards"
+        :key="card.id"
+      />
+    </div>
   </div>
 </template>
 
@@ -50,7 +50,6 @@ export default {
     Card,
     Score,
   },
-
   setup() {
     // State
     const couplesCount = ref();
@@ -60,20 +59,20 @@ export default {
     const turnComputer = ref(false);
     const cardsShown = ref([]);
     const endGame = ref(false);
-
     // Computed
     const flippedCards = computed(() => cards.value.filter((c) => c.isFlipped));
     const userCannotFlipCard = computed(
       () => turnComputer.value || flippedCards.value.length == 2
     );
     const hiddenCards = computed(() => cards.value.filter((c) => c.isHidden));
-
     //Functions
     const createCards = async () => {
       cards.value = [];
       score.value = {
         player: 0,
+        cardsPlayer: [],
         computer: 0,
+        cardsComputer: [],
       };
       turnComputer.value = false;
       cardsShown.value = [];
@@ -125,8 +124,10 @@ export default {
       if (coupleFound) {
         if (turnComputer.value) {
           score.value.computer += 1;
+          score.value.cardsComputer.push(flippedCards.value[0].img);
         } else {
           score.value.player += 1;
+          score.value.cardsPlayer.push(flippedCards.value[0].img);
         }
         flippedCards.value.forEach((element) => {
           element.isHidden = true;
