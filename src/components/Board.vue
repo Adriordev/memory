@@ -23,10 +23,11 @@
     <br />
     <button @click="createCards">Create</button>
   </div>
-  <span v-if="score">
-    <Score v-bind="score" :endGame="endGame" />
-  </span>
-  <div v-if="!endGame">
+
+  <Score v-bind="score" :endGame="endGame" v-if="score" />
+
+  <div v-if="!endGame && score">
+    <button @click="handleReset">Reset game</button>
     <div class="board-container" :class="{ 'not-pointer': userCannotFlipCard }">
       <Card
         v-bind="card"
@@ -50,8 +51,10 @@ export default {
     Card,
     Score,
   },
-  setup() {
+  emits: ["handleReset"],
+  setup(props, context) {
     // State
+
     const couplesCount = ref();
     const gameDificulty = ref("normal");
     const cards = ref([]);
@@ -59,13 +62,21 @@ export default {
     const turnComputer = ref(false);
     const cardsShown = ref([]);
     const endGame = ref(false);
+
     // Computed
+
     const flippedCards = computed(() => cards.value.filter((c) => c.isFlipped));
     const userCannotFlipCard = computed(
       () => turnComputer.value || flippedCards.value.length == 2
     );
     const hiddenCards = computed(() => cards.value.filter((c) => c.isHidden));
-    //Functions
+
+    // Functions
+
+    const handleReset = () => {
+      context.emit("handleReset");
+    };
+
     const createCards = async () => {
       cards.value = [];
       score.value = {
@@ -184,6 +195,7 @@ export default {
     };
 
     return {
+      handleReset,
       couplesCount,
       gameDificulty,
       cards,
@@ -206,7 +218,6 @@ export default {
   padding: 15px 0px 15px 0px;
 }
 .board-container {
-  border: 2px solid fuchsia;
   display: grid;
   grid-gap: 5px;
   grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));

@@ -1,9 +1,10 @@
 <template>
   <h1>MEMORY GAME</h1>
-  <Board />
+  <Board :key="reset" @handleReset="resetFunction" />
 </template>
 
 <script>
+import { ref } from "@vue/reactivity";
 import Board from "./components/Board.vue";
 
 export default {
@@ -12,8 +13,14 @@ export default {
     Board,
   },
   setup() {
+    const reset = ref(false);
+    const resetFunction = () => {
+      reset.value = !reset.value;
+    };
     return {
       Board,
+      resetFunction,
+      reset,
     };
   },
 };
