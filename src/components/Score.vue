@@ -1,19 +1,19 @@
 <template>
-  <div class="score" v-if="!endGame">
-    <div class="player-score">
+  <div class="score">
+    <div class="player-score" :class="{ 'turn-selector': !turnComputer }">
       <h3>Win player cards: {{ player }}</h3>
       <div class="imgs">
         <img :src="img" alt="" v-for="img in cardsPlayer" :key="img" />
       </div>
     </div>
-    <div class="computer-score">
+    <div class="computer-score" :class="{ 'turn-selector': turnComputer }">
       <h3>Win computer cards: {{ computer }}</h3>
       <div class="imgs">
         <img :src="img" alt="" v-for="img in cardsComputer" :key="img" />
       </div>
     </div>
   </div>
-  <div v-else>
+  <div v-if="endGame">
     <h2 v-if="player > computer">YOU WIN ({{ player }} - {{ computer }})</h2>
     <h2 v-else-if="player < computer">
       COMPUTER WINS ({{ player }} - {{ computer }})
@@ -29,6 +29,7 @@ export default {
     cardsPlayer: { type: Array },
     cardsComputer: { type: Array },
     endGame: { type: Boolean },
+    turnComputer: { type: Boolean },
   },
   setup() {
     return {};
@@ -41,18 +42,23 @@ export default {
   grid-template-columns: repeat(auto-fill, minmax(50%, 1fr));
   align-items: start;
   justify-content: space-around;
-  min-height: 150px;
-  margin-bottom: 5px;
+  margin: 2rem;
 }
 .player-score,
 .computer-score {
   padding: 5px;
+}
+.turn-selector {
+  box-sizing: border-box;
+  border: 2px solid rgb(154, 205, 50);
+  background-color: rgba(154, 205, 50, 0.5);
 }
 .imgs {
   margin: auto;
   display: flex;
   justify-content: center;
   max-width: 75%;
+  min-height: 67px;
   flex-wrap: wrap;
   gap: 1px 1px;
 }

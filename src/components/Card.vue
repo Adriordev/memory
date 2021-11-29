@@ -45,7 +45,7 @@ export default {
 .scene {
   width: 100%;
   height: 240px;
-  perspective: 600px;
+  perspective: 1000px;
 }
 .card {
   position: relative;

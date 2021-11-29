@@ -1,5 +1,5 @@
 <template>
-  <div class="generate-board" v-if="!score || endGame">
+  <div class="generate-board" v-if="!score && !endGame">
     <label for="couplesCount">Numer of couples</label>
     <br />
     <input type="number" v-model="couplesCount" @keyup.enter="createCards" />
@@ -23,19 +23,21 @@
     <br />
     <button @click="createCards">Create</button>
   </div>
-
-  <Score v-bind="score" :endGame="endGame" v-if="score" />
-
-  <div v-if="!endGame && score">
+  <div v-if="score">
+    <Score v-bind="score" :endGame="endGame" :turnComputer="turnComputer" />
     <button @click="handleReset">Reset game</button>
-    <div class="board-container" :class="{ 'not-pointer': userCannotFlipCard }">
-      <Card
-        v-bind="card"
-        @handleFlip="flipCard"
-        v-for="card in cards"
-        :key="card.id"
-      />
-    </div>
+  </div>
+  <div
+    class="board-container"
+    :class="{ 'not-pointer': userCannotFlipCard }"
+    v-if="!endGame"
+  >
+    <Card
+      v-bind="card"
+      @handleFlip="flipCard"
+      v-for="card in cards"
+      :key="card.id"
+    />
   </div>
 </template>
 
