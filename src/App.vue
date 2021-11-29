@@ -1,6 +1,6 @@
 <template>
   <h1>MEMORY GAME</h1>
-  <Board :key="reset" @handleReset="resetFunction" />
+  <Board :key="key" @handleReset="changeValueKey" />
 </template>
 
 <script>
@@ -13,14 +13,14 @@ export default {
     Board,
   },
   setup() {
-    const reset = ref(false);
-    const resetFunction = () => {
-      reset.value = !reset.value;
+    const key = ref(false);
+    const changeValueKey = () => {
+      key.value = !key.value;
     };
     return {
       Board,
-      resetFunction,
-      reset,
+      changeValueKey,
+      key,
     };
   },
 };
