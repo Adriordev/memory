@@ -43,8 +43,9 @@
 
 <script>
 import { ref, computed } from "vue";
-import { shuffle, getRandomIndex } from "../helpers/arrayHelpers";
+import { shuffle } from "../helpers/arrayHelpers";
 import { sleep } from "../helpers/sleepHelper";
+import { computerPlayGame } from "../logic/Skynet";
 import Card from "./Card.vue";
 import axios from "axios";
 import Score from "./Score.vue";
@@ -159,40 +160,12 @@ export default {
         return;
       }
       if (turnComputer.value) {
-        computerPlayGame();
-      }
-    };
-
-    const computerPlayGame = async () => {
-      await sleep(2000);
-      const possibleCards = cards.value.filter((card) => !card.isHidden);
-      //init hard mode
-      if (gameDificulty.value === "hard") {
-        const randomCardIndex = getRandomIndex(possibleCards);
-        flipCard(possibleCards[randomCardIndex].id);
-        const coupleShown = cardsShown.value.find((card) => {
-          return (
-            card.img === possibleCards[randomCardIndex].img &&
-            card.id !== possibleCards[randomCardIndex].id
-          );
-        });
-        await sleep(500);
-        if (coupleShown) {
-          flipCard(coupleShown.id);
-        } else {
-          possibleCards.splice(randomCardIndex, 1);
-          flipCard(possibleCards[getRandomIndex(possibleCards)].id);
-        }
-        //finish hard mode
-      } else {
-        //init normal mode
-        for (let index = 0; index < 2; index++) {
-          const randomCardIndex = getRandomIndex(possibleCards);
-          flipCard(possibleCards[randomCardIndex].id);
-          possibleCards.splice(randomCardIndex, 1);
+        await sleep(2000);
+        const cardsToFlip = computerPlayGame(cards, gameDificulty, cardsShown);
+        for (let index = 0; index < cardsToFlip.length; index++) {
+          flipCard(cardsToFlip[index]);
           await sleep(500);
         }
-        //finish normal mode
       }
     };
 
