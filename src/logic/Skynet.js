@@ -1,4 +1,5 @@
 import { getRandomIndex } from "../helpers/arrayHelpers";
+
 export const computerPlayGame = (cards, gameDificulty, cardsShown) => {
   const computerCardstoFlip = [];
   const possibleCards = cards.value.filter((card) => !card.isHidden);
@@ -30,3 +31,7 @@ export const computerPlayGame = (cards, gameDificulty, cardsShown) => {
   }
   return computerCardstoFlip;
 };
+
+export function sum(a, b) {
+  return a + b;
+}
