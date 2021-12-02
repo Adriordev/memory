@@ -29,6 +29,7 @@ import { ref, computed } from "vue";
 import { shuffle } from "../helpers/arrayHelpers";
 import { sleep } from "../helpers/sleepHelper";
 import { computerPlayGame } from "../logic/Skynet";
+import { getRandomIndex } from "../helpers/arrayHelpers";
 import { getImages } from "../services/getImages";
 import Card from "./Card.vue";
 import Score from "./Score.vue";
@@ -149,7 +150,8 @@ export default {
         const cardsToFlip = computerPlayGame(
           cards,
           props.gameDificulty,
-          cardsShown
+          cardsShown,
+          getRandomIndex
         );
         for (let index = 0; index < cardsToFlip.length; index++) {
           flipCard(cardsToFlip[index]);

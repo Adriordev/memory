@@ -1,6 +1,9 @@
-import { getRandomIndex } from "../helpers/arrayHelpers";
-
-export const computerPlayGame = (cards, gameDificulty, cardsShown) => {
+export const computerPlayGame = (
+  cards,
+  gameDificulty,
+  cardsShown,
+  getRandomIndex
+) => {
   const computerCardstoFlip = [];
   const possibleCards = cards.value.filter((card) => !card.isHidden);
   //init hard mode
@@ -31,7 +34,3 @@ export const computerPlayGame = (cards, gameDificulty, cardsShown) => {
   }
   return computerCardstoFlip;
 };
-
-export function sum(a, b) {
-  return a + b;
-}
