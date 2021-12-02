@@ -1,19 +1,23 @@
 <template>
-  <div class="score">
+  <div :class="[isPlayAlone ? 'score-alone' : 'score']">
     <div class="player-score" :class="{ 'turn-selector': !turnComputer }">
       <h3>Win player cards: {{ player }}</h3>
       <div class="imgs">
         <img :src="img" alt="" v-for="img in cardsPlayer" :key="img" />
       </div>
     </div>
-    <div class="computer-score" :class="{ 'turn-selector': turnComputer }">
+    <div
+      class="computer-score"
+      :class="{ 'turn-selector': turnComputer }"
+      v-if="!isPlayAlone"
+    >
       <h3>Win computer cards: {{ computer }}</h3>
       <div class="imgs">
         <img :src="img" alt="" v-for="img in cardsComputer" :key="img" />
       </div>
     </div>
   </div>
-  <div v-if="endGame">
+  <div class="endGame" v-if="endGame && !isPlayAlone">
     <h2 v-if="player > computer">YOU WIN ({{ player }} - {{ computer }})</h2>
     <h2 v-else-if="player < computer">
       COMPUTER WINS ({{ player }} - {{ computer }})
@@ -30,6 +34,7 @@ export default {
     cardsComputer: { type: Array },
     endGame: { type: Boolean },
     turnComputer: { type: Boolean },
+    isPlayAlone: { type: Boolean },
   },
   setup() {
     return {};
@@ -40,6 +45,13 @@ export default {
 .score {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(50%, 1fr));
+  align-items: start;
+  justify-content: space-around;
+  margin: 2rem;
+}
+.score-alone {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
   align-items: start;
   justify-content: space-around;
   margin: 2rem;

@@ -3,7 +3,7 @@ export const computerPlayGame = (cards, gameDificulty, cardsShown) => {
   const computerCardstoFlip = [];
   const possibleCards = cards.value.filter((card) => !card.isHidden);
   //init hard mode
-  if (gameDificulty.value === "hard") {
+  if (gameDificulty === "hard") {
     const randomCardIndex = getRandomIndex(possibleCards);
     computerCardstoFlip.push(possibleCards[randomCardIndex].id);
     const coupleShown = cardsShown.value.find((card) => {
