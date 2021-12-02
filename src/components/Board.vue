@@ -46,8 +46,8 @@ import { ref, computed } from "vue";
 import { shuffle } from "../helpers/arrayHelpers";
 import { sleep } from "../helpers/sleepHelper";
 import { computerPlayGame } from "../logic/Skynet";
+import { getImages } from "../services/getImages";
 import Card from "./Card.vue";
-import axios from "axios";
 import Score from "./Score.vue";
 export default {
   components: {
@@ -92,10 +92,7 @@ export default {
       cardsShown.value = [];
       endGame.value = false;
 
-      const response = await axios.get(
-        `https://picsum.photos/v2/list?limit=${couplesCount.value}`
-      );
-      const images = response.data.map((img) => img.download_url);
+      const images = await getImages(couplesCount.value);
 
       for (let index = 0; index < images.length; index++) {
         const cardA = {
