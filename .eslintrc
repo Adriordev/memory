@@ -3,7 +3,8 @@
         "jest": true
     },
     "parserOptions": {
-        "sourceType": "module"
-    },
-    "ecmaVersion":2015
+        "sourceType": "module",
+        "ecmaVersion":2017
+    }
+    
 }
