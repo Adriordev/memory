@@ -67,7 +67,6 @@ const SkynetHardMode = (
         for (let index = 0; index < cardsWithSameImg.length; index++) {
           computerCardstoFlip.push(cardsWithSameImg[index].id);
         }
-        console.log("computerCardstoFlip :>> ", computerCardstoFlip);
         return;
       }
     }

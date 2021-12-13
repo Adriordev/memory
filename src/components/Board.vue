@@ -168,7 +168,6 @@ export default {
       Card,
       score,
       Score,
-      /* computerPlayGame, */
       turnComputer,
       userCannotFlipCard,
       endGame,
