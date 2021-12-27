@@ -25,15 +25,19 @@
 </template>
 
 <script>
-import { ref } from "@vue/reactivity";
+import { onMounted, ref } from "vue";
 import ConfigGame from "./components/ConfigGame.vue";
-
+import { helloWorld } from "./services/helloWorld";
 export default {
   name: "App",
   components: {
     ConfigGame,
   },
   setup() {
+    onMounted(() => {
+      helloWorld(sayHello);
+    });
+    const sayHello = ref(null);
     const isPlayAlone = ref();
     const isVisibleGameSelector = ref(false);
     const selectGame = (val) => {
@@ -45,6 +49,7 @@ export default {
       isVisibleGameSelector,
       selectGame,
       ConfigGame,
+      sayHello,
     };
   },
 };
