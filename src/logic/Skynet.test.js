@@ -1,7 +1,7 @@
 import { computerPlayGame } from "./Skynet";
 
 describe("computerPlayGame", () => {
-  test("with normal mode should return random cards", () => {
+  test("with easy mode should return random cards", () => {
     // Arrange
     const getRandomIndex = jest.fn();
 
@@ -12,18 +12,13 @@ describe("computerPlayGame", () => {
     const cardsShown = { value: [] };
 
     // Act
-    const result = computerPlayGame(
-      cards,
-      "normal",
-      cardsShown,
-      getRandomIndex
-    );
+    const result = computerPlayGame(cards, "easy", cardsShown, getRandomIndex);
 
     // Assert
     expect(result).toEqual([4, 3]);
   });
 
-  test("with normal mode shouldn't return hidden cards", () => {
+  test("with easy mode shouldn't return hidden cards", () => {
     // Arrange
     const getRandomIndex = jest.fn();
 
@@ -34,18 +29,13 @@ describe("computerPlayGame", () => {
     const cardsShown = { value: [] };
 
     // Act
-    const result = computerPlayGame(
-      cards,
-      "normal",
-      cardsShown,
-      getRandomIndex
-    );
+    const result = computerPlayGame(cards, "easy", cardsShown, getRandomIndex);
 
     // Assert
     expect(result).toEqual([2, 3]);
   });
 
-  test("with normal mode shouldn't return twice the same card", () => {
+  test("with easy mode shouldn't return twice the same card", () => {
     // Arrange
     const getRandomIndex = jest.fn();
 
@@ -56,18 +46,13 @@ describe("computerPlayGame", () => {
     const cardsShown = { value: [] };
 
     // Act
-    const result = computerPlayGame(
-      cards,
-      "normal",
-      cardsShown,
-      getRandomIndex
-    );
+    const result = computerPlayGame(cards, "easy", cardsShown, getRandomIndex);
 
     // Assert
     expect(result).toEqual([2, 3]);
   });
 
-  test("with normal mode the shown cards have no influence", () => {
+  test("with easy mode the shown cards have no influence", () => {
     // Arrange
     const getRandomIndex = jest.fn();
 
@@ -78,20 +63,15 @@ describe("computerPlayGame", () => {
     const cardsShown = { value: [{ id: 2 }, { id: 3 }] }; // Although these cards have been shown, they can be returned
 
     // Act
-    const result = computerPlayGame(
-      cards,
-      "normal",
-      cardsShown,
-      getRandomIndex
-    );
+    const result = computerPlayGame(cards, "easy", cardsShown, getRandomIndex);
 
     // Assert
     expect(result).toEqual([2, 3]);
   });
-  test("with hard mode if couple of cards were previously flipped and not matched should return these cards", () => {
+  test("with normal mode should return random card and her couple if this couple has previously been flipped", () => {
     // Arrange
     const getRandomIndex = jest.fn();
-    getRandomIndex.mockReturnValueOnce(0).mockReturnValueOnce(0);
+    getRandomIndex.mockReturnValueOnce(0);
     const cards = {
       value: [
         { id: 1, img: 1 },
@@ -103,20 +83,113 @@ describe("computerPlayGame", () => {
     const cardsShown = {
       value: [
         { id: 2, img: 2, isHidden: false },
+        { id: 3, img: 1, isHidden: false },
+      ],
+    };
+
+    // Act
+    const result = computerPlayGame(
+      cards,
+      "normal",
+      cardsShown,
+      getRandomIndex
+    );
+
+    // Assert
+    expect(result).toEqual([1, 3]);
+  });
+  test("with normal mode shouldn't return hidden cards", () => {
+    // Arrange
+    const getRandomIndex = jest.fn();
+    getRandomIndex.mockReturnValueOnce(0);
+    const cards = {
+      value: [
+        { id: 1, img: 1, isHidden: true },
+        { id: 2, img: 2 },
+        { id: 3, img: 1 },
+        { id: 4, img: 2 },
+      ],
+    };
+    const cardsShown = {
+      value: [
+        { id: 4, img: 2, isHidden: false },
+        { id: 3, img: 1, isHidden: false },
+      ],
+    };
+
+    // Act
+    const result = computerPlayGame(
+      cards,
+      "normal",
+      cardsShown,
+      getRandomIndex
+    );
+
+    // Assert
+    expect(result).toEqual([2, 4]);
+  });
+  test("with normal mode should return random cards that have not been flipped", () => {
+    // Arrange
+    const getRandomIndex = jest.fn();
+    getRandomIndex.mockReturnValueOnce(0);
+    const cards = {
+      value: [
+        { id: 1, img: 1, isHidden: false },
+        { id: 2, img: 2, isHidden: true },
+        { id: 4, img: 2, isHidden: false },
+        { id: 3, img: 1, isHidden: false },
+        { id: 5, img: 3, isHidden: false },
+      ],
+    };
+    const cardsShown = {
+      value: [
+        { id: 2, img: 2, isHidden: true },
         { id: 4, img: 2, isHidden: false },
       ],
     };
 
     // Act
-    const result = computerPlayGame(cards, "hard", cardsShown, getRandomIndex);
+    const result = computerPlayGame(
+      cards,
+      "normal",
+      cardsShown,
+      getRandomIndex
+    );
 
     // Assert
-    expect(result).toEqual([2, 4]);
+    expect(result).toEqual([1, 3]);
+  });
+  test("Should return random cards without cardsShown. Normal mode", () => {
+    // Arrange
+    const getRandomIndex = jest.fn();
+    getRandomIndex.mockReturnValueOnce(0);
+    const cards = {
+      value: [
+        { id: 1, img: 1 },
+        { id: 2, img: 2 },
+        { id: 3, img: 1 },
+        { id: 4, img: 2 },
+      ],
+    };
+    const cardsShown = {
+      value: [],
+    };
+
+    // Act
+    const result = computerPlayGame(
+      cards,
+      "normal",
+      cardsShown,
+      getRandomIndex
+    );
+
+    // Assert
+    expect(result).toEqual([1, 2]);
   });
   test("with hard mode if couple of cards were previously flipped and not matched should return the first couple of these cards", () => {
     // Arrange
     const getRandomIndex = jest.fn();
-    getRandomIndex.mockReturnValueOnce(0).mockReturnValueOnce(0);
+    /* getRandomIndex.mockReturnValueOnce(0).mockReturnValueOnce(0); */
     const cards = {
       value: [
         { id: 1, img: 1 },
@@ -140,7 +213,7 @@ describe("computerPlayGame", () => {
     // Assert
     expect(result).toEqual([1, 3]);
   });
-  test("with hard mode should return random card and her couple", () => {
+  test("with hard mode should return random card and her couple if this couple has previously been flipped", () => {
     // Arrange
     const getRandomIndex = jest.fn();
     getRandomIndex.mockReturnValueOnce(0);
@@ -190,7 +263,7 @@ describe("computerPlayGame", () => {
     // Assert
     expect(result).toEqual([2, 4]);
   });
-  test("with hard mode should return random cards", () => {
+  test("with hard mode should return random cards that have not been flipped", () => {
     // Arrange
     const getRandomIndex = jest.fn();
     getRandomIndex.mockReturnValueOnce(0);

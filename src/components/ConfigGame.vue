@@ -1,43 +1,50 @@
 <template>
-  <div class="config-game" v-if="!isVisibleBoard">
+  <div v-if="!isVisibleBoard" class="config-game">
     <label for="couplesCount">Numer of couples</label>
-    <input type="number" v-model="couplesCount" />
+    <input v-model="couplesCount" type="number" />
     <div v-if="!isPlayAlone">
+      <label for="easy">Easy</label>
+      <input
+        v-model="gameDificulty"
+        type="radio"
+        name="gameDificulty"
+        value="easy"
+      />
       <label for="normal">Normal</label>
       <input
+        v-model="gameDificulty"
         type="radio"
         name="gameDificulty"
         value="normal"
-        v-model="gameDificulty"
       />
       <label for="hard">Hard</label>
       <input
+        v-model="gameDificulty"
         type="radio"
         name="gameDificulty"
         value="hard"
-        v-model="gameDificulty"
       />
     </div>
     <button @click="createBoard">Create</button>
   </div>
   <Board
-    :key="key"
-    @handleReset="changeValueKey"
-    :couplesCount="couplesCount"
-    :gameDificulty="gameDificulty"
-    :isPlayAlone="isPlayAlone"
     v-if="isVisibleBoard"
+    :key="key"
+    :couples-count="couplesCount"
+    :game-dificulty="gameDificulty"
+    :is-play-alone="isPlayAlone"
+    @handleReset="changeValueKey"
   />
 </template>
 <script>
 import Board from "./Board.vue";
 import { ref } from "vue";
 export default {
-  props: {
-    isPlayAlone: { type: Boolean },
-  },
   components: {
     Board,
+  },
+  props: {
+    isPlayAlone: { type: Boolean },
   },
   setup() {
     const couplesCount = ref();
@@ -76,7 +83,7 @@ export default {
 }
 .config-game > * {
   margin: 0.5rem auto;
-  width: 10rem;
+  /* width: 10rem; */
 }
 .config-game button {
 }
