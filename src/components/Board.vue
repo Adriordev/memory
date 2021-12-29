@@ -1,24 +1,24 @@
 <template>
   <div class="board">
-    <div class="score-container" v-if="score">
+    <div v-if="score" class="score-container">
       <Score
         v-bind="score"
-        :endGame="endGame"
-        :turnComputer="turnComputer"
-        :isPlayAlone="isPlayAlone"
+        :end-game="endGame"
+        :turn-computer="turnComputer"
+        :is-play-alone="isPlayAlone"
       />
       <button @click="handleReset">Reset game</button>
     </div>
     <div
+      v-if="!endGame"
       class="board-container"
       :class="{ 'not-pointer': userCannotFlipCard }"
-      v-if="!endGame"
     >
       <Card
-        v-bind="card"
-        @handleFlip="flipCard"
         v-for="card in cards"
+        v-bind="card"
         :key="card.id"
+        @handleFlip="flipCard"
       />
     </div>
   </div>

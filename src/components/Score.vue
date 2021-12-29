@@ -3,21 +3,21 @@
     <div class="player-score" :class="{ 'turn-selector': !turnComputer }">
       <h3>Win player cards: {{ player }}</h3>
       <div class="imgs">
-        <img :src="img" alt="" v-for="img in cardsPlayer" :key="img" />
+        <img v-for="img in cardsPlayer" :key="img" :src="img" alt="" />
       </div>
     </div>
     <div
+      v-if="!isPlayAlone"
       class="computer-score"
       :class="{ 'turn-selector': turnComputer }"
-      v-if="!isPlayAlone"
     >
       <h3>Win computer cards: {{ computer }}</h3>
       <div class="imgs">
-        <img :src="img" alt="" v-for="img in cardsComputer" :key="img" />
+        <img v-for="img in cardsComputer" :key="img" :src="img" alt="" />
       </div>
     </div>
   </div>
-  <div class="endGame" v-if="endGame && !isPlayAlone">
+  <div v-if="endGame && !isPlayAlone" class="endGame">
     <h2 v-if="player > computer">YOU WIN ({{ player }} - {{ computer }})</h2>
     <h2 v-else-if="player < computer">
       COMPUTER WINS ({{ player }} - {{ computer }})

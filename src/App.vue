@@ -2,8 +2,9 @@
   <section class="main-container">
     <header>
       <h1>MEMORY GAME</h1>
+      <p>{{ sayHello }}</p>
     </header>
-    <div class="select-game" v-if="!isVisibleGameSelector">
+    <div v-if="!isVisibleGameSelector" class="select-game">
       <h2>Welcome to memory game</h2>
       <p>Please, select the game type you want play</p>
       <br />
@@ -20,7 +21,7 @@
         </span>
       </div>
     </div>
-    <ConfigGame :isPlayAlone="isPlayAlone" v-if="isVisibleGameSelector" />
+    <ConfigGame v-if="isVisibleGameSelector" :is-play-alone="isPlayAlone" />
   </section>
 </template>
 
