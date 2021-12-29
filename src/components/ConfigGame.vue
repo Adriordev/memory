@@ -85,6 +85,4 @@ export default {
   margin: 0.5rem auto;
   /* width: 10rem; */
 }
-.config-game button {
-}
 </style>

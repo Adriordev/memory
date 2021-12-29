@@ -1,7 +1,7 @@
 export const computerPlayGame = (
   cards,
   gameDificulty,
-  cardsShown,
+  shownCards,
   getRandomIndex
 ) => {
   const computerCardstoFlip = [];
@@ -12,7 +12,7 @@ export const computerPlayGame = (
       break;
     case "normal":
       skynetNormalMode(
-        cardsShown,
+        shownCards,
         getRandomIndex,
         possibleCards,
         computerCardstoFlip
@@ -20,7 +20,7 @@ export const computerPlayGame = (
       break;
     case "hard":
       SkynetHardMode(
-        cardsShown,
+        shownCards,
         getRandomIndex,
         possibleCards,
         computerCardstoFlip
@@ -41,70 +41,70 @@ const SkynetEasyMode = (getRandomIndex, possibleCards, computerCardstoFlip) => {
 };
 
 const skynetNormalMode = (
-  cardsShown,
+  shownCards,
   getRandomIndex,
   possibleCards,
   computerCardstoFlip
 ) => {
   const randomCardIndex = getRandomIndex(possibleCards);
   computerCardstoFlip.push(possibleCards[randomCardIndex].id);
-  const coupleShown = cardsShown.value.find(
+  const shownCouple = shownCards.value.find(
     (card) =>
       card.img === possibleCards[randomCardIndex].img &&
       card.id !== possibleCards[randomCardIndex].id
   );
-  if (coupleShown) {
-    computerCardstoFlip.push(coupleShown.id);
+  if (shownCouple) {
+    computerCardstoFlip.push(shownCouple.id);
   } else {
     possibleCards.splice(randomCardIndex, 1);
-    const getIdsCardsShown = cardsShown.value.map((r) => r.id);
+    const getIdsShownCards = shownCards.value.map((r) => r.id);
     const restCards = possibleCards.filter(
-      (val) => !getIdsCardsShown.includes(val.id)
+      (val) => !getIdsShownCards.includes(val.id)
     );
     computerCardstoFlip.push(restCards[0].id);
   }
 };
 
 const SkynetHardMode = (
-  cardsShown,
+  shownCards,
   getRandomIndex,
   possibleCards,
   computerCardstoFlip
 ) => {
-  const cardsShownCanFlip = cardsShown.value.filter((c) => !c.isHidden);
-  if (cardsShownCanFlip) {
-    const cardsGroupedByImg = getCardsGroupedByImg(cardsShownCanFlip);
-    const foundCoupleShown = checkCouplesShown(
+  const shownCardsCanFlip = shownCards.value.filter((c) => !c.isHidden);
+  if (shownCardsCanFlip) {
+    const cardsGroupedByImg = getCardsGroupedByImg(shownCardsCanFlip);
+    const shownCoupleFound = checkCouplesShown(
       cardsGroupedByImg,
       computerCardstoFlip
     );
-    if (foundCoupleShown) {
+    if (shownCoupleFound) {
       return;
     }
   }
   skynetNormalMode(
-    cardsShown,
+    shownCards,
     getRandomIndex,
     possibleCards,
     computerCardstoFlip
   );
 };
 
-const getCardsGroupedByImg = (cardsShownCanFlip) => {
+const getCardsGroupedByImg = (shownCardsCanFlip) => {
   const cardsGroupedByImg = {};
-  for (let i = 0; i < cardsShownCanFlip.length; i++) {
-    if (cardsShownCanFlip[i].img in cardsGroupedByImg) {
+  for (let i = 0; i < shownCardsCanFlip.length; i++) {
+    if (shownCardsCanFlip[i].img in cardsGroupedByImg) {
       const getIdsCardsGrupedByImg = cardsGroupedByImg[
-        cardsShownCanFlip[i].img
+        shownCardsCanFlip[i].img
       ].map((cards) => cards.id);
       const checkDuplicateIds = getIdsCardsGrupedByImg.find(
-        (card) => card === cardsShownCanFlip[i].id
+        (card) => card === shownCardsCanFlip[i].id
       );
       if (!checkDuplicateIds) {
-        cardsGroupedByImg[cardsShownCanFlip[i].img].push(cardsShownCanFlip[i]);
+        cardsGroupedByImg[shownCardsCanFlip[i].img].push(shownCardsCanFlip[i]);
       }
     } else {
-      cardsGroupedByImg[cardsShownCanFlip[i].img] = [cardsShownCanFlip[i]];
+      cardsGroupedByImg[shownCardsCanFlip[i].img] = [shownCardsCanFlip[i]];
     }
   }
   return cardsGroupedByImg;

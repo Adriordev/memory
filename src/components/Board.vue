@@ -49,7 +49,7 @@ export default {
     const cards = ref([]);
     const score = ref(); //depende del modo de juego que queramos crear, si es por rondas o por juegos independientes
     const turnComputer = ref(false);
-    const cardsShown = ref([]);
+    const shownCards = ref([]);
     const endGame = ref(false);
 
     // Computed
@@ -74,7 +74,7 @@ export default {
         cardsComputer: [],
       };
       turnComputer.value = false;
-      cardsShown.value = [];
+      shownCards.value = [];
       endGame.value = false;
 
       const images = await getImages(props.couplesCount);
@@ -119,7 +119,7 @@ export default {
       if (flippedCards.value.length < 2) return;
 
       flippedCards.value.forEach((element) => {
-        cardsShown.value.push(element);
+        shownCards.value.push(element);
       });
 
       const coupleFound =
@@ -150,7 +150,7 @@ export default {
         const cardsToFlip = computerPlayGame(
           cards,
           props.gameDificulty,
-          cardsShown,
+          shownCards,
           getRandomIndex
         );
         for (let index = 0; index < cardsToFlip.length; index++) {
