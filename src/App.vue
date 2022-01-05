@@ -1,13 +1,13 @@
 <template>
   <section class="main-container">
-    <header>
+    <div class="header">
       <h1>MEMORY GAME</h1>
-      <p>{{ sayHello }}</p>
-    </header>
-    <div v-if="!isVisibleGameSelector" class="select-game">
-      <h2>Welcome to memory game</h2>
-      <p>Please, select the game type you want play</p>
       <br />
+      <h2>{{ sayHello }}</h2>
+    </div>
+    <div v-if="!isVisibleGameSelector" class="select-game">
+      <br />
+      <h3>Please, select an option</h3>
       <div class="select-buttons">
         <span>
           <label for="play-alone"> play alone </label>
@@ -27,8 +27,9 @@
 
 <script>
 import { onMounted, ref } from "vue";
-import ConfigGame from "./components/ConfigGame.vue";
+import ConfigGame from "./components/singleplayer/ConfigGame.vue";
 import { helloWorld } from "./services/helloWorld";
+
 export default {
   name: "App",
   components: {
@@ -38,6 +39,7 @@ export default {
     onMounted(() => {
       helloWorld(sayHello);
     });
+
     const sayHello = ref(null);
     const isPlayAlone = ref();
     const isVisibleGameSelector = ref(false);
@@ -63,7 +65,7 @@ export default {
 .main-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(3, 1fr));
-  grid-template-rows: 100px auto auto auto;
+  grid-template-rows: auto auto auto auto;
   padding: 10px;
   grid-template-areas:
     "header header header"
@@ -71,7 +73,7 @@ export default {
     ". config-game ."
     "board board board";
 }
-header {
+.header {
   grid-area: header;
 }
 .select-game {

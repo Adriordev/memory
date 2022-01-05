@@ -26,11 +26,11 @@
 
 <script>
 import { ref, computed } from "vue";
-import { shuffle } from "../helpers/arrayHelpers";
-import { sleep } from "../helpers/sleepHelper";
-import { computerPlayGame } from "../logic/Skynet";
-import { getRandomIndex } from "../helpers/arrayHelpers";
-import { getImages } from "../services/getImages";
+import { shuffle } from "../../helpers/arrayHelpers";
+import { sleep } from "../../helpers/sleepHelper";
+import { computerPlayGame } from "../../logic/Skynet";
+import { getRandomIndex } from "../../helpers/arrayHelpers";
+import { getImages } from "../../services/getImages";
 import Card from "./Card.vue";
 import Score from "./Score.vue";
 export default {
@@ -47,7 +47,7 @@ export default {
   setup(props, context) {
     // State
     const cards = ref([]);
-    const score = ref(); //depende del modo de juego que queramos crear, si es por rondas o por juegos independientes
+    const score = ref();
     const turnComputer = ref(false);
     const shownCards = ref([]);
     const endGame = ref(false);
