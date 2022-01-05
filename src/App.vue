@@ -5,28 +5,12 @@
       <br />
       <h2>{{ sayHello }}</h2>
     </div>
-    <div v-if="!isVisibleGameSelector" class="select-game">
-      <br />
-      <h3>Please, select an option</h3>
-      <div class="select-buttons">
-        <span>
-          <label for="play-alone"> play alone </label>
-          <br />
-          <button @click="selectGame(true)">start</button>
-        </span>
-        <span>
-          <label for="player-vs-computer"> player vs computer </label>
-          <br />
-          <button @click="selectGame(false)">start</button>
-        </span>
-      </div>
-    </div>
-    <ConfigGame v-if="isVisibleGameSelector" :is-play-alone="isPlayAlone" />
+    <ConfigGame :key="key" @trowHandleReset="changeValueKey" />
   </section>
 </template>
 
 <script>
-import { onMounted, ref } from "vue";
+import { ref, onMounted } from "vue";
 import ConfigGame from "./components/singleplayer/ConfigGame.vue";
 import { helloWorld } from "./services/helloWorld";
 
@@ -36,23 +20,22 @@ export default {
     ConfigGame,
   },
   setup() {
+    const sayHello = ref(null);
+    const key = ref(true);
     onMounted(() => {
       helloWorld(sayHello);
     });
 
-    const sayHello = ref(null);
-    const isPlayAlone = ref();
-    const isVisibleGameSelector = ref(false);
-    const selectGame = (val) => {
-      isPlayAlone.value = val;
-      isVisibleGameSelector.value = true;
+    const changeValueKey = () => {
+      key.value = !key.value;
+      console.log(key.value);
     };
+
     return {
-      isPlayAlone,
-      isVisibleGameSelector,
-      selectGame,
       ConfigGame,
       sayHello,
+      key,
+      changeValueKey,
     };
   },
 };
@@ -75,19 +58,5 @@ export default {
 }
 .header {
   grid-area: header;
-}
-.select-game {
-  grid-area: select-game;
-  display: flex;
-  flex-flow: column wrap;
-}
-.select-buttons {
-  display: inherit;
-  flex-flow: row;
-  justify-content: space-around;
-}
-.select-buttons button {
-  margin: 0.5rem;
-  width: 10rem;
 }
 </style>

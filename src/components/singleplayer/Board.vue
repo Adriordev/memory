@@ -7,6 +7,7 @@
         :turn-computer="turnComputer"
         :is-play-alone="isPlayAlone"
       />
+      <button @click="handleBack">Go back</button>
       <button @click="handleReset">Reset game</button>
     </div>
     <div
@@ -42,9 +43,11 @@ export default {
     couplesCount: { type: Number },
     gameDificulty: { type: String },
     isPlayAlone: { type: Boolean },
+
   },
-  emits: ["handleReset"],
+  emits: ["handleReset", 'handleBack'],
   setup(props, context) {
+    console.log(props);
     // State
     const cards = ref([]);
     const score = ref();
@@ -64,6 +67,9 @@ export default {
     const handleReset = () => {
       context.emit("handleReset");
     };
+    const handleBack = () =>{
+      context.emit('handleBack', props.couplesCount, props.gameDificulty, props.isPlayAlone)
+    }
 
     const createCards = async () => {
       cards.value = [];
@@ -162,6 +168,7 @@ export default {
     if (props.couplesCount > 0) createCards();
     return {
       handleReset,
+      handleBack,
       cards,
       createCards,
       flipCard,
