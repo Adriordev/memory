@@ -3,28 +3,45 @@
     <div class="header">
       <h1>MEMORY GAME</h1>
       <br />
-      <h2>{{ sayHello }}</h2>
+      <h2>Welcome to memory's game</h2>
     </div>
-    <ConfigGame :key="key" @trowHandleReset="changeValueKey" />
+    <div v-if="selectGameMode === null" class="select-game">
+      <h3>Please, select a game mode</h3>
+      <button @click="gameMode(1)">Single player</button>
+      <button @click="gameMode(2)">Multi player</button>
+    </div>
+
+    <ConfigGame
+      v-if="selectGameMode === 1"
+      :key="key"
+      @trowHandleReset="changeValueKey"
+    />
+    <MultiplayerConfigGame v-if="selectGameMode === 2" />
   </section>
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref } from "vue";
 import ConfigGame from "./components/singleplayer/ConfigGame.vue";
-import { helloWorld } from "./services/helloWorld";
+import MultiplayerConfigGame from "./components/multiplayer/mConfigGame.vue";
 
 export default {
   name: "App",
   components: {
     ConfigGame,
+    MultiplayerConfigGame,
   },
   setup() {
-    const sayHello = ref(null);
+
+    const selectGameMode = ref(null);
     const key = ref(true);
-    onMounted(() => {
-      helloWorld(sayHello);
-    });
+    const gameMode = (value) => {
+      if (value === 1) {
+        selectGameMode.value = 1;
+      } else if (value === 2) {
+        selectGameMode.value = 2;
+      }
+    };
 
     const changeValueKey = () => {
       key.value = !key.value;
@@ -33,8 +50,10 @@ export default {
 
     return {
       ConfigGame,
-      sayHello,
+      MultiplayerConfigGame,
+      selectGameMode,
       key,
+      gameMode,
       changeValueKey,
     };
   },
@@ -48,7 +67,7 @@ export default {
 .main-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(3, 1fr));
-  grid-template-rows: auto auto auto auto;
+  grid-template-rows: auto auto auto;
   padding: 10px;
   grid-template-areas:
     "header header header"
@@ -58,5 +77,23 @@ export default {
 }
 .header {
   grid-area: header;
+}
+.select-game {
+  grid-area: select-game;
+  display: flex;
+  flex-flow: column wrap;
+}
+.config-game {
+  grid-area: config-game;
+  display: flex;
+  flex-flow: column wrap;
+}
+.select-game button,
+.config-game button {
+  margin: 0.5rem auto;
+  width: 10rem;
+}
+.board {
+  grid-area: board;
 }
 </style>
