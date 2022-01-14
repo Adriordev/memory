@@ -184,9 +184,6 @@ export default {
 </script>
 
 <style>
-.board {
-  grid-area: board;
-}
 .board-container {
   display: grid;
   grid-gap: 5px;

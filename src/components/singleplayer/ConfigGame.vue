@@ -1,50 +1,51 @@
 <template>
-  <div v-if="!isVisibleGameSelector" class="select-game">
-    <br />
-    <h3>Please, select an option</h3>
-    <div class="select-buttons">
-      <span>
-        <label for="play-alone"> play alone </label>
-        <br />
-        <button @click="selectGame(true)">start</button>
-      </span>
-      <span>
-        <label for="player-vs-computer"> player vs computer </label>
-        <br />
-        <button @click="selectGame(false)">start</button>
-      </span>
+  <div class="config-game">
+    <div v-if="!isVisibleGameSelector" class="first-step-config">
+      <h3>Please, select an option</h3>
+
+      <label for="play-alone"> play alone </label>
+
+      <button @click="selectGame(true)">start</button>
+      <br />
+      <label for="player-vs-computer"> player vs computer </label>
+
+      <button @click="selectGame(false)">start</button>
+    </div>
+
+    <div
+      v-if="!isVisibleBoard && isVisibleGameSelector"
+      class="second-step-config"
+    >
+      <label for="couplesCount">Numer of couples</label>
+      <input v-model="couplesCount" type="number" />
+      <div v-if="!isPlayAlone" class="game-dificulty">
+        <label for="easy">Easy</label>
+        <input
+          v-model="gameDificulty"
+          type="radio"
+          name="gameDificulty"
+          value="easy"
+        />
+        <label for="normal">Normal</label>
+        <input
+          v-model="gameDificulty"
+          type="radio"
+          name="gameDificulty"
+          value="normal"
+        />
+        <label for="hard">Hard</label>
+        <input
+          v-model="gameDificulty"
+          type="radio"
+          name="gameDificulty"
+          value="hard"
+        />
+      </div>
+      <button @click="createBoard">Create</button>
+      <button @click="passToAppHandleReset">Back</button>
     </div>
   </div>
 
-  <div v-if="!isVisibleBoard && isVisibleGameSelector" class="config-game">
-    <label for="couplesCount">Numer of couples</label>
-    <input v-model="couplesCount" type="number" />
-    <div v-if="!isPlayAlone">
-      <label for="easy">Easy</label>
-      <input
-        v-model="gameDificulty"
-        type="radio"
-        name="gameDificulty"
-        value="easy"
-      />
-      <label for="normal">Normal</label>
-      <input
-        v-model="gameDificulty"
-        type="radio"
-        name="gameDificulty"
-        value="normal"
-      />
-      <label for="hard">Hard</label>
-      <input
-        v-model="gameDificulty"
-        type="radio"
-        name="gameDificulty"
-        value="hard"
-      />
-    </div>
-    <button @click="createBoard">Create</button>
-    <button @click="passToAppHandleReset">Back</button>
-  </div>
   <Board
     v-if="isVisibleBoard"
     :couples-count="couplesCount"
@@ -61,7 +62,7 @@ export default {
   components: {
     Board,
   },
-  emits:['trowHandleReset'],
+  emits: ["trowHandleReset"],
   setup(props, context) {
     const isPlayAlone = ref();
     const isVisibleGameSelector = ref(false);
@@ -87,9 +88,9 @@ export default {
       isVisibleBoard.value = true;
     };
 
-    const passToAppHandleReset = () =>{
-      context.emit('trowHandleReset')
-    }
+    const passToAppHandleReset = () => {
+      context.emit("trowHandleReset");
+    };
     return {
       Board,
       couplesCount,
@@ -100,35 +101,24 @@ export default {
       isVisibleGameSelector,
       selectGame,
       goBack,
-      passToAppHandleReset
+      passToAppHandleReset,
     };
   },
 };
 </script>
+
 <style>
-.select-game {
-  grid-area: select-game;
-  display: flex;
-  flex-flow: column wrap;
-}
-.select-buttons {
+.first-step-config,
+.second-step-config {
   display: inherit;
-  flex-flow: row;
-  justify-content: space-around;
-}
-.select-buttons button {
-  margin: 0.5rem;
-  width: 10rem;
-}
-.config-game {
-  grid-area: config-game;
-  display: flex;
   flex-flow: column wrap;
+  justify-content: center;
 }
-.config-game > * {
+.second-step-config input {
   margin: 0.5rem auto;
-}
-.config-game button {
   width: 10rem;
+}
+input[type="radio"]{
+  width: 1rem
 }
 </style>

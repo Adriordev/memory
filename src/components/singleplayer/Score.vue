@@ -51,9 +51,9 @@ export default {
 }
 .score-alone {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
   align-items: start;
-  justify-content: space-around;
+  justify-content: center;
   margin: 2rem;
 }
 .player-score,
