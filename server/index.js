@@ -17,28 +17,12 @@ const io = new Server(server, {
 const port = 3000;
 
 const { saveSession, loadSession } = require("./session");
-const { createGame, saveGame, loadGame } = require("./game");
+const { createGame, saveGame, findGame } = require("./games");
+const { flipCard, checkIfCoupleWasFound } = require("./gameActions");
 const crypto = require("crypto");
 const randomId = () => crypto.randomBytes(8).toString("hex");
 
-app.put("/api/game", async (req, res) => {
-  const data = req.body;
-  const newGame = await createGame(data.couples, data.userId);
-  saveGame(newGame.gameId, newGame);
-  res.send(newGame);
-});
-app.put("/api/game/:gameId", (req, res) => {
-  const gameId = req.params.gameId;
-  const userId = req.body.userId
-  const getGame = loadGame(gameId, userId);
-  console.log(getGame);
-  if (getGame === undefined) {
-    res.status(404).send("Game not found");
-  }
-  res.send(getGame);
-});
-
-//First connection
+//----INIT USERS middleware----
 io.use((socket, next) => {
   const sessionId = socket.handshake.auth.sessionId;
   if (sessionId) {
@@ -59,27 +43,65 @@ io.use((socket, next) => {
   socket.userName = userName;
   next();
 });
+//----FINISH USERS middlware----
 
+//----INIT USERS connection----
 io.on("connection", (socket) => {
   saveSession(socket.sessionId, {
     userId: socket.userId,
     userName: socket.userName,
   });
+
   socket.emit("session", {
     sessionId: socket.sessionId,
     userId: socket.userId,
     userName: socket.userName,
   });
+  //----FINISH USERS connection----
 
-  socket.on("joinGame", (data) => {
-    io.in(data.joinGame)
-      .allSockets()
-      .then((res) => {
-        if (res.size === 2) {
-          io.to(data.joinGame).emit("");
-        }
-      });
+  //---- GAMES ACTIONS----
+  socket.on("createGame", async ({ userId, couples }) => {
+    const newGame = await createGame(userId, couples);
+    const gameId = newGame.gameId;
+    socket.join(gameId);
+    saveGame(gameId, newGame);
+    console.log("game saved: " + gameId);
+    socket.emit("startGame", newGame);
   });
+
+  socket.on("joinGame", ({ gameId, userId }) => {
+    const game = findGame(gameId);
+    const isUserAlreadyRegister = game.score.some(
+      (score) => score.userId === userId
+    );
+    if (!isUserAlreadyRegister) {
+      game.score.push({ userId: userId, foundCards: [] });
+      const turnIndex =  Math.floor(Math.random() * (2 - 0)) + 0
+      game.turn = game.score[turnIndex].userId
+      saveGame(gameId, game);
+    }
+    socket.join(gameId);
+    io.to(gameId).emit("updateGame", game);
+  });
+
+  socket.on("flipCard", async ({ cardId, gameId, userId }) => {
+    //if(turn !== userId)return
+    const game = findGame(gameId);
+    if(game.turn !== userId)return
+    const gameResult = await flipCard(cardId, game);
+    saveGame(gameId, gameResult);
+    
+    io.to(gameId).emit("updateGame", game);
+    const flippedCards = game.cards.filter((c) => c.isFlipped)
+    
+    if (flippedCards.length === 2){
+      const gameResult = await checkIfCoupleWasFound(game)
+
+      saveGame(gameId, gameResult);
+      io.to(gameId).emit("updateGame", game);
+    } 
+  });
+  //----FINISH GAMES ACTIONS----
 });
 
 server.listen(port, () => {

@@ -1,8 +1,8 @@
 const crypto = require("crypto");
 const { getImages } = require("./services/getImages");
 const { shuffle } = require("./helpers/arrayHelpers");
-const games = new Map();
-const createGame = async (couples, userId) => {
+
+const createGame = async (userId, couples) => {
   const gameId = crypto.randomBytes(8).toString("hex");
   const cards = [];
   const score = [
@@ -11,16 +11,12 @@ const createGame = async (couples, userId) => {
       foundCards: [],
     },
   ];
-
-  /* shownCards.value = [];
-  endGame.value = false; */
-
+  const turn = null;
   const images = await getImages(couples);
 
   for (let index = 0; index < images.length; index++) {
     const cardA = {
       id: `${index}A`,
-      text: index,
       isFlipped: false,
       isHidden: false,
       img: images[index],
@@ -29,7 +25,6 @@ const createGame = async (couples, userId) => {
 
     const cardB = {
       id: `${index}B`,
-      text: index,
       isFlipped: false,
       isHidden: false,
       img: images[index],
@@ -37,16 +32,20 @@ const createGame = async (couples, userId) => {
     cards.push(cardB);
   }
   shuffle(cards);
-  return { cards, score, gameId };
+  return { gameId, cards, score, turn };
 };
+
+const games = new Map();
+
 const saveGame = (gameId, game) => {
   games.set(gameId, game);
 };
-const loadGame = (gameId, userId) => {
-  const findGame = games.get(gameId);
-  if (userId !== findGame.score[0].userId) {
-    findGame.score.push({ userId: userId, foundCards: [] });
-  }
-  return findGame;
+const findGame = (gameId) => {
+  return games.get(gameId);
 };
-module.exports = { createGame, saveGame, loadGame };
+
+module.exports = {
+  createGame,
+  saveGame,
+  findGame,
+};
