@@ -21,7 +21,7 @@
       <br />
       <span :class="{ errCouples: errCouples }">{{ errCouples }}</span>
       <br />
-      <button @click="generateGame">generate game</button>
+      <button @click="createGame">generate game</button>
       <p>or</p>
       <h3>Join in a game</h3>
       <input v-model="codeGame" type="text" @focus="errCode = ''" />
@@ -32,20 +32,15 @@
     </div>
   </div>
 
-  <MultiplayerBoard
-    v-if="isVisibleBoard"
-    :key="keyComponent"
-    :data-game="dataGame"
-  />
+  <mBoard v-if="isVisibleBoard" :key="keyComponent" v-bind="dataGame" />
 </template>
 <script>
-import { ref, onUnmounted } from "vue";
-import socket from "../../socket";
-import MultiplayerBoard from "./mBoard.vue";
-import axios from "axios";
+import { ref, onUnmounted, watchEffect } from "vue";
+import  socket  from "../../socket";
+import mBoard from "./mBoard.vue";
 export default {
   components: {
-    MultiplayerBoard,
+    mBoard,
   },
   setup() {
     const name = ref("");
@@ -55,12 +50,18 @@ export default {
     const errCouples = ref(null);
     const errCode = ref(null);
     const isVisibleBoard = ref(false);
-    const dataGame = ref(null);
     const codeGame = ref(null);
     const keyComponent = ref(true);
-
+    const dataGame = ref({
+      gameId: null,
+      cards: null,
+      score: null,
+      turn: null,
+    });
+    watchEffect(() => {
+      console.log('dataGame en mConfig: ', dataGame.value);
+    });
     //----User's register with socket.io ----
-
     let session = localStorage.getItem("session");
     if (session) {
       session = JSON.parse(session);
@@ -98,45 +99,48 @@ export default {
       socket.off("connect_error");
     });
 
-    //----Functions----
+    socket.on("updateGame", (game) => {
+      dataGame.value = game;
+      isVisibleBoard.value = true;
+    });
 
-    const generateGame = async () => {
-      if (couplesCount.value <= 0 || couplesCount.value === "") {
+    const createGame = () => {
+      const userId = socket.userId;
+      const couples = couplesCount.value;
+      if (couples <= 0 || couples === "") {
         errCouples.value = "Enter a valid number please";
         return;
       }
-      const data = {
-        couples: couplesCount.value,
-        userId: socket.userId,
-      };
-      try {
-        const response = await axios.put(
-          "http://localhost:3000/api/game",
-          data
-        );
-        isVisibleBoard.value = true;
-        dataGame.value = response.data;
-      } catch (error) {
-        errCouples.value = error;
-      }
+      socket.emit("createGame", {
+        userId: userId,
+        couples: couples,
+      });
     };
 
-    const joinGame = async () => {
-      if (codeGame.value === "") {
+    const joinGame = () => {
+      const gameId = codeGame.value;
+      const userId = socket.userId;
+      if (gameId === "") {
         errCode.value = "Code is empty, enter a valid code";
         return;
       }
-      const data = {userId: socket.userId}
-      try {
-        const response = await axios.put(
-          ("http://localhost:3000/api/game/" + codeGame.value), data
-        );
-        isVisibleBoard.value = true;
-        dataGame.value = response.data;
-      } catch (error) {
-        errCode.value = error.response.data;
-      }
+      socket.emit("joinGame", {
+        gameId: gameId,
+        userId: userId,
+      });
     };
+
+    socket.on("startGame", (game) => {
+      //aqui generar un link con el codigo para poder pinchar y acceder al juego
+      dataGame.value = game;
+      isVisibleBoard.value = true;
+    });
+
+    socket.on("connect_error", (err) => {
+      if (err.message === "invalid couples") {
+        errCouples.value = "Enter a valid number please";
+      }
+    });
 
     return {
       name,
@@ -147,11 +151,11 @@ export default {
       errCouples,
       errCode,
       isVisibleBoard,
-      generateGame,
+      createGame,
       dataGame,
       joinGame,
       codeGame,
-      MultiplayerBoard,
+      mBoard,
       keyComponent,
     };
   },
