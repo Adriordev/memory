@@ -61,16 +61,24 @@ io.on("connection", (socket) => {
 
   //---- GAMES ACTIONS----
   socket.on("createGame", async ({ userId, couples }) => {
+    if (couples <= 0 || couples === "") {
+      socket.emit('catch_error', {err: 'invalid couples'} )
+      return
+    }
     const newGame = await createGame(userId, couples);
     const gameId = newGame.gameId;
     socket.join(gameId);
     saveGame(gameId, newGame);
     console.log("game saved: " + gameId);
-    socket.emit("startGame", newGame);
+    socket.emit("generateCode", gameId);
   });
 
   socket.on("joinGame", ({ gameId, userId }) => {
     const game = findGame(gameId);
+    if(game === undefined){
+      socket.emit('catch_error', {err: 'invalid code'} )
+      return
+    }
     const isUserAlreadyRegister = game.score.some(
       (score) => score.userId === userId
     );
@@ -81,25 +89,32 @@ io.on("connection", (socket) => {
       saveGame(gameId, game);
     }
     socket.join(gameId);
-    io.to(gameId).emit("updateGame", game);
+    if(game.score.length == 2){
+      io.to(gameId).emit("updateGame", game);
+    }return
+    
   });
 
   socket.on("flipCard", async ({ cardId, gameId, userId }) => {
     //if(turn !== userId)return
-    const game = findGame(gameId);
-    if(game.turn !== userId)return
-    const gameResult = await flipCard(cardId, game);
-    saveGame(gameId, gameResult);
+    let game = findGame(gameId);
+    let flippedCards = game.cards.filter((c) => c.isFlipped)
     
-    io.to(gameId).emit("updateGame", game);
-    const flippedCards = game.cards.filter((c) => c.isFlipped)
+    if(game.turn !== userId || flippedCards.length > 1)return
     
-    if (flippedCards.length === 2){
-      const gameResult = await checkIfCoupleWasFound(game)
+    game = flipCard(cardId, game);
+    
+    saveGame(gameId, game);
+    io.to(gameId).emit("updateGame", game); 
 
-      saveGame(gameId, gameResult);
+    flippedCards = game.cards.filter((c) => c.isFlipped)
+    if (flippedCards.length == 2){
+      game = await checkIfCoupleWasFound(game)
+
+      saveGame(gameId, game);
       io.to(gameId).emit("updateGame", game);
     } 
+
   });
   //----FINISH GAMES ACTIONS----
 });
