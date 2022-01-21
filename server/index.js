@@ -14,7 +14,7 @@ const io = new Server(server, {
   },
 });
 
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
 const { saveSession, loadSession } = require("./session");
 const { createGame, saveGame, findGame } = require("./games");
@@ -119,6 +119,6 @@ io.on("connection", (socket) => {
   //----FINISH GAMES ACTIONS----
 });
 
-server.listen(port, () => {
-  console.log("listening on *:3000");
+server.listen(PORT, () => {
+  console.log(`listening on *: ${PORT}`);
 });
