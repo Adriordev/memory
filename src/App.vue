@@ -1,6 +1,6 @@
 <template>
   <section class="main-container">
-    <div class="header">
+    <div v-if="selectGameMode === null" class="header">
       <h1>MEMORY GAME</h1>
       <br />
       <h2>Welcome to memory's game</h2>
@@ -12,7 +12,7 @@
     </div>
 
     <ConfigGame
-      v-if="selectGameMode === 1"
+      v-if="selectGameMode == 1"
       :key="key"
       @trowHandleReset="changeValueKey"
     />
@@ -32,7 +32,6 @@ export default {
     MultiplayerConfigGame,
   },
   setup() {
-
     const selectGameMode = ref(null);
     const key = ref(true);
     const gameMode = (value) => {
