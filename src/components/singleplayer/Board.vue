@@ -43,9 +43,8 @@ export default {
     couplesCount: { type: Number },
     gameDificulty: { type: String },
     isPlayAlone: { type: Boolean },
-
   },
-  emits: ["handleReset", 'handleBack'],
+  emits: ["handleReset", "handleBack"],
   setup(props, context) {
     console.log(props);
     // State
@@ -67,9 +66,14 @@ export default {
     const handleReset = () => {
       context.emit("handleReset");
     };
-    const handleBack = () =>{
-      context.emit('handleBack', props.couplesCount, props.gameDificulty, props.isPlayAlone)
-    }
+    const handleBack = () => {
+      context.emit(
+        "handleBack",
+        props.couplesCount,
+        props.gameDificulty,
+        props.isPlayAlone
+      );
+    };
 
     const createCards = async () => {
       cards.value = [];
@@ -88,7 +92,6 @@ export default {
       for (let index = 0; index < images.length; index++) {
         const cardA = {
           id: `${index}A`,
-          text: index,
           isFlipped: false,
           isHidden: false,
           img: images[index],
@@ -97,7 +100,6 @@ export default {
 
         const cardB = {
           id: `${index}B`,
-          text: index,
           isFlipped: false,
           isHidden: false,
           img: images[index],
@@ -112,13 +114,6 @@ export default {
       selectCardtoFlip.isFlipped = true;
 
       await checkIfCoupleWasFound();
-    };
-
-    const resetFlippedCards = async () => {
-      await sleep(2000);
-      flippedCards.value.forEach((element) => {
-        element.isFlipped = false;
-      });
     };
 
     const checkIfCoupleWasFound = async () => {
@@ -165,7 +160,16 @@ export default {
         }
       }
     };
+
+    const resetFlippedCards = async () => {
+      await sleep(2000);
+      flippedCards.value.forEach((element) => {
+        element.isFlipped = false;
+      });
+    };
+
     if (props.couplesCount > 0) createCards();
+    
     return {
       handleReset,
       handleBack,
