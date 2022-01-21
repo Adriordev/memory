@@ -1,10 +1,9 @@
 <template>
   <div class="board">
-    <!-- <div v-if="score" class="score-container">
-      <Score v-bind="score" :end-game="endGame" />
-      <button @click="handleReset">Reset game</button>
-    </div> -->
-    <div class="board-container">
+    <div class="score-container">
+      <mScore :score="score" :turn="turn" />
+    </div>
+    <div class="board-container" :class="{ 'not-pointer': userCannotFlipCard }">
       <mCard
         v-for="card in cards"
         v-bind="card"
@@ -18,12 +17,12 @@
 <script>
 import socket from "../../socket";
 import mCard from "./mCard.vue";
-import Score from "../singleplayer/Score.vue";
-import { watchEffect } from "@vue/runtime-core";
+import mScore from "../multiplayer/mScore.vue";
+import { computed } from "@vue/runtime-core";
 export default {
   components: {
     mCard,
-    /* Score, */
+    mScore,
   },
   props: {
     gameId: {
@@ -33,31 +32,33 @@ export default {
       type: Array,
     },
     score: {
-      type: Object,
+      type: Array,
     },
     turn: {
       type: String,
     },
   },
   setup(props) {
-    watchEffect(() => {
-      console.log("dataGame en props: ", props);
-      console.log("comprobacion de turno: ", props.turn, socket.userId);
-      console.log('Scores: ', props.score);
-    });
+
+    // Computed
+
+    const flippedCards = computed(() => props.cards.filter((c) => c.isFlipped));
+    const userCannotFlipCard = computed(() => flippedCards.value.length == 2);
+
     const flipCard = (id) => {
-        console.log(socket.userId);
-        socket.emit("flipCard", {
-          cardId: id,
-          gameId: props.gameId,
-          userId: socket.userId,
-        });
-      };
-    
+      console.log(socket.userId);
+      socket.emit("flipCard", {
+        cardId: id,
+        gameId: props.gameId,
+        userId: socket.userId,
+      });
+    };
+
     return {
       flipCard,
       mCard,
-      Score,
+      mScore,
+      userCannotFlipCard,
     };
   },
 };

@@ -1,9 +1,8 @@
 const { sleep } = require("./helpers/sleepHelper");
 
-const flipCard = async (cardId, game) => {
+const flipCard = (cardId, game) => {
   const selectCardtoFlip = game.cards.find((c) => c.id === cardId);
   selectCardtoFlip.isFlipped = true;
-
   return game;
 };
 const checkIfCoupleWasFound = async (game) => {
@@ -19,16 +18,17 @@ const checkIfCoupleWasFound = async (game) => {
   };
 
   if (coupleFound) {
-    const player = scores.find((p) => p.userId === game.turn);
-    player.foundCards.push(flippedCards[0].img);
+    const userPlaying = scores.find((p) => p.userId === game.turn);
+    userPlaying.foundCards.push(flippedCards[0].img);
+
     flippedCards.forEach((element) => {
       element.isHidden = true;
     });
     await resetFlippedCards(flippedCards);
   } else {
     await resetFlippedCards(flippedCards);
-    const opponent = scores.find((p) => p.userId !== game.turn);
-    game.turn = opponent.userId;
+    const opponentUser = scores.find((p) => p.userId !== game.turn);
+    game.turn = opponentUser.userId;
   }
   return game;
 };
