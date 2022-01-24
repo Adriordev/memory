@@ -116,6 +116,7 @@ export default {
 
     const createGame = () => {
       const userId = socket.userId;
+      const userName = socket.userName
       const couples = couplesCount.value;
       if (couples <= 0 || couples === "") {
         errCouples.value = "Enter a valid number please";
@@ -123,11 +124,11 @@ export default {
       }
       socket.emit("createGame", {
         userId: userId,
+        userName: userName,
         couples: couples,
       });
       couplesCount.value = "";
       socket.on("generateCode", (gameId) => {
-      //aqui generar un link con el codigo para poder pinchar y acceder al juego
       shareCodeGame.value = gameId;
     });
     };
@@ -135,6 +136,7 @@ export default {
     const joinGame = () => {
       const gameId = codeGame.value;
       const userId = socket.userId;
+      const userName = socket.userName
       if (!gameId) {
         errCode.value = "Code is empty, enter a valid code";
         return;
@@ -142,6 +144,7 @@ export default {
       socket.emit("joinGame", {
         gameId: gameId,
         userId: userId,
+        userName: userName
       });
     };
 

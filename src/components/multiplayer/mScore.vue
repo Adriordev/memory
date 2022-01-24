@@ -4,7 +4,7 @@
       class="player-score"
       :class="[turn === score[0].userId ? 'turn-selector' : '']"
     >
-      <h3>player1</h3>
+      <h3>{{score[0].userName}}</h3>
       <div class="imgs">
         <img v-for="img in score[0].foundCards" :key="img" :src="img" alt="" />
       </div>
@@ -13,7 +13,7 @@
       class="player-score"
       :class="[turn === score[1].userId ? 'turn-selector' : '']"
     >
-      <h3>player2</h3>
+      <h3>{{score[1].userName}}</h3>
       <div class="imgs">
         <img v-for="img in score[1].foundCards" :key="img" :src="img" alt="" />
       </div>

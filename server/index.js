@@ -60,61 +60,57 @@ io.on("connection", (socket) => {
   //----FINISH USERS connection----
 
   //---- GAMES ACTIONS----
-  socket.on("createGame", async ({ userId, couples }) => {
+  socket.on("createGame", async ({ userId, userName, couples }) => {
     if (couples <= 0 || couples === "") {
-      socket.emit('catch_error', {err: 'invalid couples'} )
-      return
+      socket.emit("catch_error", { err: "invalid couples" });
+      return;
     }
-    const newGame = await createGame(userId, couples);
+    const newGame = await createGame(userId, userName, couples);
     const gameId = newGame.gameId;
     socket.join(gameId);
     saveGame(gameId, newGame);
-    console.log("game saved: " + gameId);
     socket.emit("generateCode", gameId);
   });
 
-  socket.on("joinGame", ({ gameId, userId }) => {
+  socket.on("joinGame", ({ gameId, userId, userName }) => {
     const game = findGame(gameId);
-    if(game === undefined){
-      socket.emit('catch_error', {err: 'invalid code'} )
-      return
+    if (game === undefined) {
+      socket.emit("catch_error", { err: "invalid code" });
+      return;
     }
     const isUserAlreadyRegister = game.score.some(
       (score) => score.userId === userId
     );
     if (!isUserAlreadyRegister) {
-      game.score.push({ userId: userId, foundCards: [] });
-      const turnIndex =  Math.floor(Math.random() * (2 - 0)) + 0
-      game.turn = game.score[turnIndex].userId
+      game.score.push({ userId: userId, userName: userName, foundCards: [] });
+      const turnIndex = Math.floor(Math.random() * (2 - 0)) + 0;
+      game.turn = game.score[turnIndex].userId;
       saveGame(gameId, game);
     }
     socket.join(gameId);
-    if(game.score.length == 2){
+    if (game.score.length == 2) {
       io.to(gameId).emit("updateGame", game);
-    }return
-    
+    }
+    return;
   });
 
   socket.on("flipCard", async ({ cardId, gameId, userId }) => {
-    //if(turn !== userId)return
     let game = findGame(gameId);
-    let flippedCards = game.cards.filter((c) => c.isFlipped)
-    
-    if(game.turn !== userId || flippedCards.length > 1)return
-    
-    game = flipCard(cardId, game);
-    
+    let flippedCards = game.cards.filter((c) => c.isFlipped);
+
+    if (game.turn !== userId || flippedCards.length > 1) return;
+
+    flipCard(cardId, game);
+
     saveGame(gameId, game);
-    io.to(gameId).emit("updateGame", game); 
+    io.to(gameId).emit("updateGame", game);
 
-    flippedCards = game.cards.filter((c) => c.isFlipped)
-    if (flippedCards.length == 2){
-      game = await checkIfCoupleWasFound(game)
-
+    flippedCards = game.cards.filter((c) => c.isFlipped);
+    if (flippedCards.length == 2) {
+      await checkIfCoupleWasFound(game);
       saveGame(gameId, game);
       io.to(gameId).emit("updateGame", game);
-    } 
-
+    }
   });
   //----FINISH GAMES ACTIONS----
 });

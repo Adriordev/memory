@@ -3,10 +3,10 @@ const { sleep } = require("./helpers/sleepHelper");
 const flipCard = (cardId, game) => {
   const selectCardtoFlip = game.cards.find((c) => c.id === cardId);
   selectCardtoFlip.isFlipped = true;
-  return game;
 };
 const checkIfCoupleWasFound = async (game) => {
   const flippedCards = game.cards.filter((c) => c.isFlipped);
+  const hiddenCards = game.cards.filter((c) => c.isHidden);
   const coupleFound = flippedCards[0].img === flippedCards[1].img;
   const scores = game.score.map((s) => s);
 
@@ -30,7 +30,9 @@ const checkIfCoupleWasFound = async (game) => {
     const opponentUser = scores.find((p) => p.userId !== game.turn);
     game.turn = opponentUser.userId;
   }
-  return game;
+  if (flippedCards.length == hiddenCards.length) {
+    game.isGameOver = true;
+  }
 };
 
 module.exports = { flipCard, checkIfCoupleWasFound };
