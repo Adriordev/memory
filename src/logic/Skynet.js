@@ -1,92 +1,98 @@
 export const computerPlayGame = (
+  computerCardId,
   cards,
   gameDificulty,
   shownCards,
   getRandomIndex
 ) => {
-  const computerCardstoFlip = [];
-  const possibleCards = cards.value.filter((c) => !c.isHidden);
+  const possibleCards = cards.filter((c) => !c.isHidden && !c.isFlipped);
   switch (gameDificulty) {
     case "easy":
-      SkynetEasyMode(getRandomIndex, possibleCards, computerCardstoFlip);
+      SkynetEasyMode(computerCardId, getRandomIndex, possibleCards);
       break;
     case "normal":
       skynetNormalMode(
+        computerCardId,
+        cards,
         shownCards,
         getRandomIndex,
-        possibleCards,
-        computerCardstoFlip
+        possibleCards
       );
       break;
     case "hard":
       SkynetHardMode(
+        computerCardId,
+        cards,
         shownCards,
         getRandomIndex,
-        possibleCards,
-        computerCardstoFlip
+        possibleCards
       );
       break;
     default:
       break;
   }
-  return computerCardstoFlip;
+  console.log(computerCardId);
 };
 
-const SkynetEasyMode = (getRandomIndex, possibleCards, computerCardstoFlip) => {
-  for (let index = 0; index < 2; index++) {
-    const randomCardIndex = getRandomIndex(possibleCards);
-    computerCardstoFlip.push(possibleCards[randomCardIndex].id);
-    possibleCards.splice(randomCardIndex, 1);
-  }
+const SkynetEasyMode = (computerCardId, getRandomIndex, possibleCards) => {
+  const randomCardIndex = getRandomIndex(possibleCards);
+  computerCardId.value = possibleCards[randomCardIndex].id;
 };
 
 const skynetNormalMode = (
+  computerCardId,
+  cards,
   shownCards,
   getRandomIndex,
-  possibleCards,
-  computerCardstoFlip
+  possibleCards
 ) => {
-  const randomCardIndex = getRandomIndex(possibleCards);
-  computerCardstoFlip.push(possibleCards[randomCardIndex].id);
-  const shownCouple = shownCards.value.find(
-    (card) =>
-      card.img === possibleCards[randomCardIndex].img &&
-      card.id !== possibleCards[randomCardIndex].id
-  );
-  if (shownCouple) {
-    computerCardstoFlip.push(shownCouple.id);
+  const flippedCards = cards.filter((c) => c.isFlipped);
+  if (flippedCards.length == 0) {
+    SkynetEasyMode(computerCardId, getRandomIndex, possibleCards);
   } else {
-    possibleCards.splice(randomCardIndex, 1);
-    const getIdsShownCards = shownCards.value.map((r) => r.id);
-    const restCards = possibleCards.filter(
-      (val) => !getIdsShownCards.includes(val.id)
+    const previousFlippedCard = cards.find((c) => c.isFlipped);
+
+    const shownCouple = shownCards.find(
+      (card) =>
+        card.img === previousFlippedCard.img &&
+        card.id !== previousFlippedCard.id
     );
-    computerCardstoFlip.push(restCards[0].id);
+    if (shownCouple) {
+      computerCardId.value = shownCouple.id;
+    } else {
+      const getIdsShownCards = shownCards.map((r) => r.id);
+      const restCards = possibleCards.filter(
+        (val) => !getIdsShownCards.includes(val.id)
+      );
+      computerCardId.value = restCards[0].id;
+    }
   }
 };
 
 const SkynetHardMode = (
+  computerCardId,
+  cards,
   shownCards,
   getRandomIndex,
-  possibleCards,
-  computerCardstoFlip
+  possibleCards
 ) => {
-  const shownCardsCanFlip = shownCards.value.filter((c) => !c.isHidden);
+  const shownCardsCanFlip = shownCards.filter((c) => !c.isHidden);
   if (shownCardsCanFlip) {
     const cardsGroupedByImg = getCardsGroupedByImg(shownCardsCanFlip);
     const shownCoupleFound = checkCouplesShown(
       cardsGroupedByImg,
-      computerCardstoFlip
+      computerCardId
     );
     if (shownCoupleFound) {
       return;
     }
   }
   skynetNormalMode(
+    computerCardId,
+    cards,
     shownCards,
     getRandomIndex,
-    possibleCards,
-    computerCardstoFlip
+    possibleCards
   );
 };
 
@@ -110,16 +116,13 @@ const getCardsGroupedByImg = (shownCardsCanFlip) => {
   return cardsGroupedByImg;
 };
 
-const checkCouplesShown = (cardsGroupedByImg, computerCardstoFlip) => {
+const checkCouplesShown = (cardsGroupedByImg, computerCardId) => {
   for (let key in cardsGroupedByImg) {
     let cardsWithSameImg = cardsGroupedByImg[key];
     if (cardsWithSameImg.length !== 2) {
       return;
     } else {
-      for (let index = 0; index < cardsWithSameImg.length; index++) {
-        computerCardstoFlip.push(cardsWithSameImg[index].id);
-      }
-      return computerCardstoFlip;
+      computerCardId.value = cardsWithSameImg[0].id;
     }
   }
 };
