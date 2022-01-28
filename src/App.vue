@@ -1,59 +1,107 @@
 <template>
   <section class="main-container">
-    <div v-if="selectGameMode === null" class="header">
+    <div class="header">
       <h1>MEMORY GAME</h1>
       <br />
-      <h2>Welcome to memory's game</h2>
+      <h2>
+        Welcome <span v-if="isRegister">{{ name }}</span> to memory's game
+      </h2>
     </div>
-    <div v-if="selectGameMode === null" class="select-game">
+    <div v-if="!isRegister" class="register-name">
+      <label for="name">User name</label>
+      <input id="name" v-model="name" type="text" @focus="errName = ''" />
+      <span :class="{ errName: errName }">{{ errName }}</span>
+
+      <button type="submit" @click="RegisterName">Enter</button>
+    </div>
+    <div class="select-game">
       <h3>Please, select a game mode</h3>
-      <button @click="gameMode(1)">Single player</button>
-      <button @click="gameMode(2)">Multi player</button>
+      <button @click="selectGameMode(1)">Single player</button>
+      <button @click="selectGameMode(2)">Multi player</button>
     </div>
 
-    <ConfigGame
-      v-if="selectGameMode == 1"
-      :key="key"
-      @trowHandleReset="changeValueKey"
-    />
-    <MultiplayerConfigGame v-if="selectGameMode === 2" />
+    <ConfigGame v-if="gameMode" :game-mode="gameMode" :name="name" />
   </section>
 </template>
 
 <script>
-import { ref } from "vue";
-import ConfigGame from "./components/singleplayer/ConfigGame.vue";
-import MultiplayerConfigGame from "./components/multiplayer/mConfigGame.vue";
+import { ref, onUnmounted } from "vue";
 
+import ConfigGame from "./components/ConfigGame.vue";
+import socket from "./socket";
 export default {
   name: "App",
   components: {
     ConfigGame,
-    MultiplayerConfigGame,
   },
   setup() {
-    const selectGameMode = ref(null);
-    const key = ref(true);
-    const gameMode = (value) => {
-      if (value === 1) {
-        selectGameMode.value = 1;
-      } else if (value === 2) {
-        selectGameMode.value = 2;
+    const name = ref(null);
+    const isRegister = ref(false);
+    const errName = ref("");
+    const errCouples = ref("");
+    const gameMode = ref("");
+    const selectGameMode = (value) => {
+      if (value == 1) {
+        gameMode.value = "singlePlayer";
+      } else if (value == 2) {
+        gameMode.value = "multiPlayer";
       }
     };
+    //----User's register with socket.io ----
 
-    const changeValueKey = () => {
-      key.value = !key.value;
-      console.log(key.value);
+    let session = localStorage.getItem("session");
+    if (session) {
+      session = JSON.parse(session);
+
+      const sessionId = session.sessionId;
+      const userId = session.userId;
+      const userName = session.userName;
+
+      socket.auth = { sessionId, userId, userName };
+
+      socket.connect();
+    }
+
+    const RegisterName = () => {
+      if (!name.value) {
+        errName.value = "Enter a valid name please";
+        return;
+      }
+      const userName = name.value;
+      socket.auth = { userName };
+      socket.connect();
     };
+
+    socket.on("session", ({ sessionId, userId, userName }) => {
+      socket.auth = { sessionId, userId, userName };
+      localStorage.setItem("session", JSON.stringify(socket.auth));
+      socket.sessionId = sessionId;
+      socket.userId = userId;
+      socket.userName = userName;
+
+      name.value = userName;
+      isRegister.value = true;
+    });
+
+    socket.on("connect_error", (err) => {
+      if (err.message === "invalid userName") {
+        errName.value = "Enter a valid name please";
+      }
+    });
+
+    onUnmounted(() => {
+      socket.off("connect_error");
+    });
 
     return {
       ConfigGame,
-      MultiplayerConfigGame,
       selectGameMode,
-      key,
       gameMode,
-      changeValueKey,
+      name,
+      RegisterName,
+      isRegister,
+      errName,
+      errCouples,
     };
   },
 };
@@ -63,36 +111,7 @@ export default {
 #app {
   text-align: center;
 }
-.main-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(3, 1fr));
-  grid-template-rows: auto auto auto;
-  padding: 10px;
-  grid-template-areas:
-    "header header header"
-    ". select-game ."
-    ". config-game ."
-    "board board board";
-}
-.header {
-  grid-area: header;
-}
-.select-game {
-  grid-area: select-game;
-  display: flex;
-  flex-flow: column wrap;
-}
-.config-game {
-  grid-area: config-game;
-  display: flex;
-  flex-flow: column wrap;
-}
-.select-game button,
-.config-game button {
-  margin: 0.5rem auto;
-  width: 10rem;
-}
-.board {
-  grid-area: board;
+.errName {
+  color: red;
 }
 </style>
