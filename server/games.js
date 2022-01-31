@@ -56,9 +56,10 @@ const createGame = async (userId, userName, couples, singlePlayerMode) => {
 
 const games = new Map();
 
-const saveGame = (gameId, game) => {
-  games.set(gameId, game);
+const saveGame = (game) => {
+  games.set(game.gameId, game);
 };
+
 const findGame = (gameId) => {
   return games.get(gameId);
 };

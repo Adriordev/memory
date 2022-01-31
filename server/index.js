@@ -74,7 +74,7 @@ io.on("connection", (socket) => {
         socket.emit("catch_error", { err: "invalid couples" });
         return;
       }
-      
+
       const game = await createGame(
         userId,
         userName,
@@ -85,7 +85,7 @@ io.on("connection", (socket) => {
       const gameId = game.gameId;
       socket.join(gameId);
 
-      saveGame(gameId, game);
+      saveGame(game);
       if (gameDificulty) {
         socket.emit("updateGame", game);
       } else {
@@ -107,7 +107,7 @@ io.on("connection", (socket) => {
       game.score.push({ userId: userId, userName: userName, foundCards: [] });
       const turnIndex = Math.floor(Math.random() * (2 - 0)) + 0;
       game.turn = game.score[turnIndex].userId;
-      saveGame(gameId, game);
+      saveGame(game);
     }
     socket.join(gameId);
     if (game.score.length == 2) {
@@ -118,26 +118,26 @@ io.on("connection", (socket) => {
 
   socket.on("flipCard", ({ cardId, gameId, userId }) => {
     let game = findGame(gameId);
-    
+
     let flippedCards = game.cards.filter((c) => c.isFlipped);
 
     if (game.turn !== userId || flippedCards.length > 1) return;
 
     flipCard(cardId, game);
 
-    saveGame(gameId, game);
+    saveGame(game);
     io.to(gameId).emit("updateFlippedCard", game);
 
     flippedCards = game.cards.filter((c) => c.isFlipped);
     if (flippedCards.length == 2) {
       checkIfCoupleWasFound(game);
 
-      io.to(gameId).emit('resetFlippedCards', flippedCards)
+      io.to(gameId).emit("resetFlippedCards", flippedCards);
 
       checkGameOver(game);
 
-      saveGame(gameId, game);
-      
+      saveGame(game);
+
       io.to(gameId).emit("updateGame", game);
     }
   });
