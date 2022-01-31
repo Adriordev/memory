@@ -94,6 +94,7 @@
 import { ref } from "vue";
 import socket from "../socket";
 import Board from "./Board.vue";
+import { sleep } from "../helpers/sleepHelper";
 export default {
   components: {
     Board,
@@ -108,8 +109,8 @@ export default {
   },
   setup() {
     const couplesCount = ref(null);
-    const singlePlayerMode = ref("playAlone");
-    const gameDificulty = ref("easy");
+    const singlePlayerMode = ref();
+    const gameDificulty = ref();
 
     const errCouples = ref("");
     const shareCodeGame = ref(null);
@@ -122,7 +123,7 @@ export default {
       cards: [],
       score: [],
       turn: null,
-      showCards: []
+      showCards: [],
     });
 
     //----SINGLEPLAYER
@@ -130,8 +131,14 @@ export default {
     //----MULTIPLAYER
 
     socket.on("updateGame", (game) => {
-      dataGame.value = game;
+      sleep(2000).then(() => {
+        dataGame.value = game;
+      });
       isVisibleBoard.value = true;
+    });
+
+    socket.on("updateFlippedCard", (game) => {
+      dataGame.value = game;
     });
 
     const createGame = () => {

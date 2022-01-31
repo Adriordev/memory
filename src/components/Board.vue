@@ -67,7 +67,7 @@ export default {
   },
   setup(props) {
     //State
-    /* const computerCardId = ref(""); */
+    
     // Computed
     const flippedCards = computed(() => props.cards.filter((c) => c.isFlipped));
     const userCannotFlipCard = computed(() => flippedCards.value.length == 2);
@@ -103,6 +103,14 @@ export default {
         userId: socket.userId,
       });
     };
+
+    socket.on("resetFlippedCards", (cards) => {
+      cards.forEach((element) => {
+        sleep(2000).then(() => {
+          element.isFlipped = false;
+        });
+      });
+    });
 
     return {
       flipCard,
