@@ -144,6 +144,19 @@ io.on("connection", (socket) => {
   //----FINISH GAMES ACTIONS----
 });
 
+app.post("/api/game", async (req, res) => {
+  const { userId, userName, couplesCount, singlePlayerMode } = req.body;
+  const game = await createGame(
+    userId,
+    userName,
+    couplesCount,
+    singlePlayerMode
+  );
+  saveGame(game);
+
+  res.send(game.gameId);
+});
+
 server.listen(PORT, () => {
   console.log(`listening on *: ${PORT}`);
 });

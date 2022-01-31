@@ -95,6 +95,8 @@ import { ref } from "vue";
 import socket from "../socket";
 import Board from "./Board.vue";
 import { sleep } from "../helpers/sleepHelper";
+import axios from "axios";
+
 export default {
   components: {
     Board,
@@ -141,7 +143,7 @@ export default {
       dataGame.value = game;
     });
 
-    const createGame = () => {
+    const createGame = async () => {
       if (couplesCount.value <= 0 || couplesCount.value === "") {
         errCouples.value = "Enter a valid number please";
         return;
@@ -149,16 +151,11 @@ export default {
       const userId = socket.userId;
       const userName = socket.userName;
 
-      socket.emit("createGame", {
+      await axios.post("http://localhost:3000/api/game", {
         userId: userId,
         userName: userName,
-        couples: couplesCount.value,
+        couplesCount: couplesCount.value,
         singlePlayerMode: singlePlayerMode.value,
-        gameDificulty: gameDificulty.value,
-      });
-      couplesCount.value = "";
-      socket.on("generateCode", (gameId) => {
-        shareCodeGame.value = gameId;
       });
     };
 
