@@ -1,19 +1,24 @@
 <template>
   <div class="home">
     
-    <h1>Hola mundo</h1>
+    <Register />
     
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-
+import Register from '../components/Register.vue'
 
 export default {
   name: 'Home',
   components: {
-    
+    Register
+  },
+  setup() {
+    return{
+      Register
+    }
   }
 }
 </script>
