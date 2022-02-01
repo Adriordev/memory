@@ -2,6 +2,8 @@
   <section class="main-container">
     <div class="header">
       <h1>MEMORY GAME</h1>
+      <router-link to="/home">Home</router-link>
+      <router-view></router-view>
       <br />
       <h2>
         Welcome <span v-if="isRegister">{{ name }}</span> to memory's game
@@ -40,6 +42,7 @@ export default {
     const errName = ref("");
     const errCouples = ref("");
     const gameMode = ref("");
+
     const selectGameMode = (value) => {
       if (value == 1) {
         gameMode.value = "singlePlayer";
