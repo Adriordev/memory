@@ -67,34 +67,12 @@ io.on("connection", (socket) => {
 
   //---- GAMES ACTIONS----
 
-  socket.on(
-    "createGame",
-    async ({ userId, userName, couples, singlePlayerMode, gameDificulty }) => {
-      if (couples <= 0 || couples === "") {
-        socket.emit("catch_error", { err: "invalid couples" });
-        return;
-      }
-
-      const game = await createGame(
-        userId,
-        userName,
-        couples,
-        singlePlayerMode,
-        gameDificulty
-      );
-      const gameId = game.gameId;
-      socket.join(gameId);
-
-      saveGame(game);
-      if (gameDificulty) {
-        socket.emit("updateGame", game);
-      } else {
-        socket.emit("generateCode", gameId);
-      }
-    }
-  );
-
-  socket.on("joinGame", ({ gameId, userId, userName }) => {
+  
+  socket.on('joinGameRoom', (game)=>{
+    console.log('entro');
+    socket.join(game.gameId)
+  })
+  /* socket.on("joinGame", ({ gameId, userId, userName }) => {
     const game = findGame(gameId);
     if (game === undefined) {
       socket.emit("catch_error", { err: "invalid code" });
@@ -114,9 +92,13 @@ io.on("connection", (socket) => {
       io.to(gameId).emit("updateGame", game);
     }
     return;
-  });
+  }); */
+  socket.on('joinGameRoom', (game)=>{
+    socket.join(game.gameId)
+  })
 
   socket.on("flipCard", ({ cardId, gameId, userId }) => {
+    
     let game = findGame(gameId);
 
     let flippedCards = game.cards.filter((c) => c.isFlipped);
@@ -126,6 +108,7 @@ io.on("connection", (socket) => {
     flipCard(cardId, game);
 
     saveGame(game);
+    
     io.to(gameId).emit("updateFlippedCard", game);
 
     flippedCards = game.cards.filter((c) => c.isFlipped);
@@ -142,19 +125,26 @@ io.on("connection", (socket) => {
     }
   });
   //----FINISH GAMES ACTIONS----
+  
 });
-
 app.post("/api/game", async (req, res) => {
-  const { userId, userName, couplesCount, singlePlayerMode } = req.body;
+  const { userId, userName, couplesCount, singlePlayerMode, gameDificulty } =
+    req.body;
   const game = await createGame(
     userId,
     userName,
     couplesCount,
-    singlePlayerMode
+    singlePlayerMode,
+    gameDificulty
   );
   saveGame(game);
-
   res.send(game.gameId);
+});
+
+app.get("/api/game:id", (req, res) => {
+  const gameId = req.params.id;
+  const game = findGame(gameId);
+  res.send(game);
 });
 
 server.listen(PORT, () => {
