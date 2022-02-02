@@ -1,20 +1,21 @@
 <template>
   <div class="board">
+    <h1>Board</h1>
     <div class="score-container">
       <Score
-        :score="score"
-        :turn="turn"
-        :is-game-over="isGameOver"
-        :single-player-mode="singlePlayerMode"
+        :score="dataGame.score"
+        :turn="dataGame.turn"
+        :is-game-over="dataGame.isGameOver"
+        :single-player-mode="dataGame.singlePlayerMode"
       />
     </div>
     <div
-      v-if="!isGameOver"
+      v-if="!dataGame.isGameOver"
       class="board-container"
       :class="{ 'not-pointer': userCannotFlipCard }"
     >
       <Card
-        v-for="card in cards"
+        v-for="card in dataGame.cards"
         v-bind="card"
         :key="card.id"
         @handleFlip="flipCard"
@@ -27,7 +28,8 @@
 import socket from "../socket";
 import Card from "./Card.vue";
 import Score from "./Score.vue";
-import { computed, onUpdated } from "vue";
+import { computed, ref, onBeforeMount, onUpdated } from "vue";
+import axios from "axios";
 import { computerPlayGame } from "../logic/Skynet";
 import { getRandomIndex } from "../helpers/arrayHelpers";
 import { sleep } from "../helpers/sleepHelper";
@@ -38,71 +40,73 @@ export default {
     Score,
   },
   props: {
-    gameId: {
+    id: {
       type: String,
-    },
-    cards: {
-      type: Array,
-    },
-    score: {
-      type: Array,
-    },
-    turn: {
-      type: String,
-    },
-    isGameOver: {
-      type: Boolean,
-    },
-    singlePlayerMode: {
-      type: String,
-      default: undefined,
-    },
-    gameDificulty: {
-      type: String,
-      default: undefined,
-    },
-    shownCards: {
-      type: Array,
     },
   },
   setup(props) {
     //State
-    
+    const dataGame = ref({
+      gameId: "",
+      cards: [],
+      score: [],
+      turn: "",
+      isGameOver: false,
+      singlePlayerMode: "",
+      gameDificulty: "",
+      shownCards: [],
+    });
+
     // Computed
-    const flippedCards = computed(() => props.cards.filter((c) => c.isFlipped));
+    const flippedCards = computed(() =>
+      dataGame.value.cards.filter((c) => c.isFlipped)
+    );
     const userCannotFlipCard = computed(() => flippedCards.value.length == 2);
 
     //Functions
+    onBeforeMount(async () => {
+      const response = await axios.get(
+        `http://localhost:3000/api/game${props.id}`
+      );
+      const game = response.data;
+      socket.emit("joinGameRoom", game);
+      dataGame.value = game;
+    });
 
     onUpdated(() => {
-      if (props.isGameOver) return;
+      if (dataGame.value.isGameOver) return;
 
-      if (props.turn === "computer" && !userCannotFlipCard.value) {
+      if (dataGame.value.turn === "computer" && !userCannotFlipCard.value) {
         sleep(1000).then(() => {
           let computerCardId = [];
           computerPlayGame(
             computerCardId,
-            props.cards,
-            props.gameDificulty,
-            props.shownCards,
+            dataGame.value.cards,
+            dataGame.value.gameDificulty,
+            dataGame.value.shownCards,
             getRandomIndex
           );
+
           socket.emit("flipCard", {
             cardId: computerCardId.value,
-            gameId: props.gameId,
+            gameId: dataGame.value.gameId,
             userId: "computer",
           });
         });
       }
     });
 
-    const flipCard = (id) => {
-      socket.emit("flipCard", {
-        cardId: id,
-        gameId: props.gameId,
-        userId: socket.userId,
+    socket.on("updateGame", (game) => {
+      console.log("entra");
+      sleep(2000).then(() => {
+        dataGame.value = game;
       });
-    };
+    });
+
+    socket.on("updateFlippedCard", (game) => {
+      console.log("update: ", game.cards);
+      dataGame.value = game;
+    });
 
     socket.on("resetFlippedCards", (cards) => {
       cards.forEach((element) => {
@@ -112,7 +116,16 @@ export default {
       });
     });
 
+    const flipCard = (id) => {
+      socket.emit("flipCard", {
+        cardId: id,
+        gameId: dataGame.value.gameId,
+        userId: socket.userId,
+      });
+    };
+
     return {
+      dataGame,
       flipCard,
       Card,
       Score,

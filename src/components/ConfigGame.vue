@@ -82,24 +82,17 @@
       <button @click="joinGame">Join</button>
     </div>
   </div>
-  <div v-show="isVisibleBoard">
-    <Board
-      v-bind="dataGame"
-      :single-player-mode="singlePlayerMode"
-      :game-dificulty="gameDificulty"
-    />
-  </div>
 </template>
 <script>
 import { ref } from "vue";
 import socket from "../socket";
 import Board from "./Board.vue";
-import { sleep } from "../helpers/sleepHelper";
 import axios from "axios";
+import { useRouter } from "vue-router";
 
 export default {
   components: {
-    Board,
+   /*  Board, */
   },
   props: {
     gameMode: {
@@ -120,28 +113,10 @@ export default {
     const isVisibleBoard = ref(false);
     const codeGame = ref(null);
 
-    const dataGame = ref({
-      gameId: "",
-      cards: [],
-      score: [],
-      turn: null,
-      showCards: [],
-    });
-
+    const router = useRouter();
     //----SINGLEPLAYER
 
     //----MULTIPLAYER
-
-    socket.on("updateGame", (game) => {
-      sleep(2000).then(() => {
-        dataGame.value = game;
-      });
-      isVisibleBoard.value = true;
-    });
-
-    socket.on("updateFlippedCard", (game) => {
-      dataGame.value = game;
-    });
 
     const createGame = async () => {
       if (couplesCount.value <= 0 || couplesCount.value === "") {
@@ -151,11 +126,16 @@ export default {
       const userId = socket.userId;
       const userName = socket.userName;
 
-      await axios.post("http://localhost:3000/api/game", {
+      const response = await axios.post("http://localhost:3000/api/game", {
         userId: userId,
         userName: userName,
         couplesCount: couplesCount.value,
         singlePlayerMode: singlePlayerMode.value,
+        gameDificulty: gameDificulty.value
+      });
+      const gameId = response.data;
+      router.push({
+        path: `/game${gameId}`,
       });
     };
 
@@ -192,7 +172,6 @@ export default {
       errCode,
       isVisibleBoard,
       createGame,
-      dataGame,
       joinGame,
       codeGame,
       Board,
