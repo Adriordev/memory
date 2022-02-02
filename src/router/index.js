@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Register from '../components/Register'
+import Board from '../components/Board'
 
 const routes = [
   {
@@ -13,6 +14,12 @@ const routes = [
     name:'Home',
     component: Home
   }, */
+  {
+    path: '/game:id',
+    name: 'Game',
+    component: Board,
+    props: true
+  },
   {
     path: '/about',
     name: 'About',
