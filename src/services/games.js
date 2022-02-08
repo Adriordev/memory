@@ -1,4 +1,5 @@
 import axios from "axios";
+
 export const getGameId = async (
   couplesCount,
   singlePlayerMode,
@@ -13,3 +14,14 @@ export const getGameId = async (
   return gameId;
 };
 
+export const addUsertoGame = async (userId, userName, gameId) => {
+  try {
+    await axios.put(`http://localhost:3000/api/game${gameId}`, {
+      userId: userId,
+      userName: userName,
+    });
+    return true;
+  } catch (error) {
+    return false;
+  }
+};

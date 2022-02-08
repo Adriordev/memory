@@ -1,5 +1,5 @@
 <template>
-  <div  v-if="isWaitingOpponent" class="board">
+  <div v-if="isWaitingOpponent" class="board">
     <div class="score-container">
       <Score
         :score="dataGame.score"
@@ -31,7 +31,7 @@ import { socket } from "../socket";
 import Card from "./Card.vue";
 import Score from "./Score.vue";
 import { computed, ref, onUpdated } from "vue";
-import axios from "axios";
+import { addUsertoGame } from "./../services/games";
 import { computerPlayGame } from "../logic/Skynet";
 import { getRandomIndex } from "../helpers/arrayHelpers";
 import { sleep } from "../helpers/sleepHelper";
@@ -72,7 +72,6 @@ export default {
     //Functions
 
     onUpdated(() => {
-      
       if (dataGame.value.isGameOver) return;
       if (dataGame.value.turn === "computer" && !userCannotFlipCard.value) {
         sleep(1000).then(() => {
@@ -93,9 +92,9 @@ export default {
         });
       }
     });
-    
-    const gameSocket = socket(props.id)
-    
+
+    const gameSocket = socket(props.id);
+
     let session = localStorage.getItem("session");
     if (session) {
       session = JSON.parse(session);
@@ -108,34 +107,28 @@ export default {
 
       gameSocket.connect();
     }
-    gameSocket.on("session", ({ sessionId, userId, userName }) => {
-      console.log('vuelvo');
+    gameSocket.on("session", async ({ sessionId, userId, userName }) => {
+      console.log("vuelvo");
       gameSocket.auth = { sessionId, userId, userName };
       localStorage.setItem("session", JSON.stringify(gameSocket.auth));
       gameSocket.sessionId = sessionId;
       gameSocket.userId = userId;
       gameSocket.userName = userName;
-      addUsertoGame(userId, userName);
+      const userSuccesfullyAdded = await addUsertoGame(
+        userId,
+        userName,
+        props.id
+      );
+
+      if (userSuccesfullyAdded) {
+        gameSocket.emit("joinGame", props.id);
+      } else {
+        router.push({
+          name: "Config",
+        });
+      }
     });
 
-    const addUsertoGame = async (userId, userName) => {
-      console.log("entro", userId, userName);
-      try {
-        const response = await axios.put(
-          `http://localhost:3000/api/game${props.id}`,
-          { userId: userId, userName: userName }
-        );
-        const gameId = response.data;
-        gameSocket.emit("joinGame", gameId);
-      } catch (error) {
-        if (error.response) {
-          alert(error.response.data.error);
-          router.push({
-            name: "Config",
-          });
-        }
-      }
-    };
     gameSocket.on("startGame", (game) => {
       dataGame.value = game;
     });
