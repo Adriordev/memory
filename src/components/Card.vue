@@ -44,7 +44,7 @@ export default {
 <style>
 .scene {
   width: 100%;
-  height: 240px;
+  height: 20rem;
   perspective: 1000px;
 }
 .card {
@@ -69,7 +69,7 @@ export default {
   position: absolute;
   width: 100%;
   height: 100%;
-  line-height: 420px;
+  line-height: 35rem;
   color: white;
   text-align: center;
   font-weight: bold;
@@ -91,8 +91,8 @@ export default {
 }
 img {
   position: relative;
-  width: inherit;
-  height: inherit;
+  min-width: 100%;
+  min-height: 100%;
   object-fit: cover;
   border-radius: 2%;
 }

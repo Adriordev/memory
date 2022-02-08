@@ -5,7 +5,9 @@ export const computerPlayGame = (
   shownCards,
   getRandomIndex
 ) => {
+  
   const possibleCards = cards.filter((c) => !c.isHidden && !c.isFlipped);
+  
   switch (gameDificulty) {
     case "easy":
       SkynetEasyMode(computerCardId, getRandomIndex, possibleCards);
@@ -31,7 +33,6 @@ export const computerPlayGame = (
     default:
       break;
   }
-  console.log(computerCardId);
 };
 
 const SkynetEasyMode = (computerCardId, getRandomIndex, possibleCards) => {

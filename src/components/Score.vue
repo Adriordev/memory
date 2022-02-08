@@ -12,17 +12,17 @@
       </div>
     </div>
   </div>
-  <div v-show="isGameOver" class="gameOver">
-    <div v-if="isPlayAlone">
+  <div v-show="isGameOver">
+    <div v-if="isPlayAlone" class="gameOver">
       <p>WELL DONE!</p>
     </div>
-    <div v-else>
+    <div v-else class="gameOver">
       <p>{{ winPlayerName }} WINS!</p>
     </div>
   </div>
 </template>
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, watchEffect } from "vue";
 export default {
   props: {
     score: {
@@ -42,7 +42,9 @@ export default {
   setup(props) {
     // State
     const isTurnActive = ref(null);
-
+    watchEffect(() => {
+      console.log("props en score: ", props);
+    });
     //Computed
     const isPlayAlone = computed(() => props.singlePlayerMode === "playAlone");
     const isWinPlayer = computed(() => props.isGameOver && !isPlayAlone.value);
@@ -87,8 +89,9 @@ export default {
   flex-wrap: wrap;
   gap: 1px 1px;
 }
-.imgs > img {
-  width: 100px;
+img {
+  min-width: 50px !important;
+  max-height: 50px !important;
   border-radius: 4%;
 }
 .gameOver {
@@ -101,7 +104,7 @@ export default {
   height: 300px;
   width: 50%;
   margin: 0 auto;
-  margin-top: 12rem;
+
   display: flex;
   justify-content: center;
   align-items: center;
