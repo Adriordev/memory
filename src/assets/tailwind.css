@@ -1,0 +1,40 @@
+@tailwind base;
+
+@tailwind components;
+
+@tailwind utilities;
+
+@layer base {
+  /* body {
+    @apply container h-screen mx-auto text-center px-4 py-4;
+  } */
+  h1 {
+    @apply text-2xl;
+  }
+  h2 {
+    @apply text-xl;
+  }
+}
+
+@layer components {
+  .btn{
+    @apply mx-auto border-2 border-emerald-700 bg-emerald-100 hover:bg-emerald-400 hover:text-white font-bold uppercase my-2 px-5 py-1 shadow-2xl
+  }
+  .error{
+    @apply h-8 leading-8 my-2
+  }
+  .error-span {
+    @apply text-red-600 border rounded-md mx-auto px-3  bg-red-300;
+  }
+  input[type=text]{
+    @apply  border-0 
+  }
+  imput[type=text]:focus{
+    @apply appearance-none border-red-600
+  }
+  input[type=number]{
+    @apply rounded-md
+  }
+  
+
+}
