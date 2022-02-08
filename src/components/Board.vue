@@ -1,6 +1,5 @@
 <template>
-  <div class="board">
-    <h1>Board</h1>
+  <div  v-if="isWaitingOpponent" class="board">
     <div class="score-container">
       <Score
         :score="dataGame.score"
@@ -22,19 +21,24 @@
       />
     </div>
   </div>
+  <div v-else>
+    <h1>Waiting Opponent</h1>
+  </div>
 </template>
 
 <script>
-import socket from "../socket";
+import { socket } from "../socket";
 import Card from "./Card.vue";
 import Score from "./Score.vue";
-import { computed, ref, onBeforeMount, onUpdated } from "vue";
+import { computed, ref, onUpdated } from "vue";
 import axios from "axios";
 import { computerPlayGame } from "../logic/Skynet";
 import { getRandomIndex } from "../helpers/arrayHelpers";
 import { sleep } from "../helpers/sleepHelper";
+import { useRouter } from "vue-router";
 
 export default {
+  name: "Board",
   components: {
     Card,
     Score,
@@ -57,25 +61,19 @@ export default {
       shownCards: [],
     });
 
+    const router = useRouter();
+
     // Computed
     const flippedCards = computed(() =>
       dataGame.value.cards.filter((c) => c.isFlipped)
     );
     const userCannotFlipCard = computed(() => flippedCards.value.length == 2);
-
+    const isWaitingOpponent = computed(() => dataGame.value.isStarted);
     //Functions
-    onBeforeMount(async () => {
-      const response = await axios.get(
-        `http://localhost:3000/api/game${props.id}`
-      );
-      const game = response.data;
-      socket.emit("joinGameRoom", game);
-      dataGame.value = game;
-    });
 
     onUpdated(() => {
+      
       if (dataGame.value.isGameOver) return;
-
       if (dataGame.value.turn === "computer" && !userCannotFlipCard.value) {
         sleep(1000).then(() => {
           let computerCardId = [];
@@ -87,7 +85,7 @@ export default {
             getRandomIndex
           );
 
-          socket.emit("flipCard", {
+          gameSocket.emit("flipCard", {
             cardId: computerCardId.value,
             gameId: dataGame.value.gameId,
             userId: "computer",
@@ -95,20 +93,64 @@ export default {
         });
       }
     });
+    
+    const gameSocket = socket(props.id)
+    
+    let session = localStorage.getItem("session");
+    if (session) {
+      session = JSON.parse(session);
 
-    socket.on("updateGame", (game) => {
-      console.log("entra");
+      const sessionId = session.sessionId ? session.sessionId : undefined;
+      const userId = session.userId ? session.userId : undefined;
+      const userName = session.userName;
+
+      gameSocket.auth = { sessionId, userId, userName };
+
+      gameSocket.connect();
+    }
+    gameSocket.on("session", ({ sessionId, userId, userName }) => {
+      console.log('vuelvo');
+      gameSocket.auth = { sessionId, userId, userName };
+      localStorage.setItem("session", JSON.stringify(gameSocket.auth));
+      gameSocket.sessionId = sessionId;
+      gameSocket.userId = userId;
+      gameSocket.userName = userName;
+      addUsertoGame(userId, userName);
+    });
+
+    const addUsertoGame = async (userId, userName) => {
+      console.log("entro", userId, userName);
+      try {
+        const response = await axios.put(
+          `http://localhost:3000/api/game${props.id}`,
+          { userId: userId, userName: userName }
+        );
+        const gameId = response.data;
+        gameSocket.emit("joinGame", gameId);
+      } catch (error) {
+        if (error.response) {
+          alert(error.response.data.error);
+          router.push({
+            name: "Config",
+          });
+        }
+      }
+    };
+    gameSocket.on("startGame", (game) => {
+      dataGame.value = game;
+    });
+
+    gameSocket.on("updateGame", (game) => {
       sleep(2000).then(() => {
         dataGame.value = game;
       });
     });
 
-    socket.on("updateFlippedCard", (game) => {
-      console.log("update: ", game.cards);
+    gameSocket.on("updateFlippedCard", (game) => {
       dataGame.value = game;
     });
 
-    socket.on("resetFlippedCards", (cards) => {
+    gameSocket.on("resetFlippedCards", (cards) => {
       cards.forEach((element) => {
         sleep(2000).then(() => {
           element.isFlipped = false;
@@ -116,11 +158,17 @@ export default {
       });
     });
 
+    /* socket.on("catch_error", ({ err }) => {
+      if (err === "invalid couples") {
+        errCouples.value = "Enter a valid number please";
+      }
+    }); */
+
     const flipCard = (id) => {
-      socket.emit("flipCard", {
+      gameSocket.emit("flipCard", {
         cardId: id,
         gameId: dataGame.value.gameId,
-        userId: socket.userId,
+        userId: gameSocket.userId,
       });
     };
 
@@ -130,6 +178,7 @@ export default {
       Card,
       Score,
       userCannotFlipCard,
+      isWaitingOpponent,
     };
   },
 };

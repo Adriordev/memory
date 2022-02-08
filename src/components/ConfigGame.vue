@@ -1,16 +1,46 @@
 <template>
-  {{ gameMode }} - {{ name }}
-  <div v-if="!isVisibleBoard" class="config-game">
-    <!-- si por props mando una variable que en funcion de su valor 
-          muestre la parte de configuracion de singleplayer o multiplayer
-          con el nombre previamente introducido.
-       -->
-    <div v-if="gameMode === 'singlePlayer'" id="SINGLEPLAYER">
+  <div
+    class="
+      flex flex-auto flex-col
+      justify-center
+      items-center
+      mx-auto
+      max-w-screen-md
+      m-4
+      p-4
+      border
+    "
+  >
+    <h2>Welcome to memory's game</h2>
+    <h3>Please, select a game mode</h3>
+
+    <button class="btn" @click="selectGameMode(1)">Singleplayer</button>
+    <br />
+    <button class="btn" @click="selectGameMode(2)">Multiplayer</button>
+
+    <label for="couplesCount">Number of couples</label>
+    <br />
+    <input
+      id="couples"
+      v-model="couplesCount"
+      class="input-text"
+      type="number"
+      @focus="errCouples = ''"
+    />
+    <span class="error" :class="{ 'error-span': errCouples }">{{
+      errCouples
+    }}</span>
+    <div
+      v-if="selectedGameMode === 'singlePlayer'"
+      id="SINGLEPLAYER"
+      class="flex flex-col items-center"
+    >
       <h3>Please, select an option</h3>
       <div class="first-step">
         <label for="play-alone"> play alone </label>
         <input
           v-model="singlePlayerMode"
+          class="radio-btn"
           type="radio"
           name="singlePlayerMode"
           value="playAlone"
@@ -19,14 +49,13 @@
         <label for="player-vs-computer"> player vs computer </label>
         <input
           v-model="singlePlayerMode"
+          class="radio-btn"
           type="radio"
           name="singlePlayerMode"
           value="playerVsComputer"
         />
       </div>
-      <div class="second-step">
-        <label for="couplesCount">Numer of couples</label>
-        <input v-model="couplesCount" type="number" />
+      <div v-if="singlePlayerMode === 'playerVsComputer'" class="second-step">
         <div class="game-dificulty">
           <label for="easy">Easy</label>
           <input
@@ -50,139 +79,71 @@
             value="hard"
           />
         </div>
-        <button @click="createGame">Create</button>
-        <button @click="passToAppHandleReset">Back</button>
+      </div>
+      <div v-if="singlePlayerMode">
+        <button class="btn" @click="createGame">Create</button>
       </div>
     </div>
 
-    <div v-if="gameMode === 'multiPlayer'" id="MULTIPLAYER">
-      <h2>Welcome {{ name }}</h2>
-      <h3>Generate game</h3>
-      <label for="couplesCount">Number of couples</label>
-      <br />
-      <input
-        id="couples"
-        v-model="couplesCount"
-        type="number"
-        @focus="errCouples = ''"
-      />
-      <br />
-      <span :class="{ errCouples: errCouples }">{{ errCouples }}</span>
-      <br />
-      <button @click="createGame">generate game</button>
-      <span v-if="shareCodeGame">
-        <p>Share to play: {{ shareCodeGame }}</p>
-      </span>
-      <p>or</p>
-      <h3>Join in a game</h3>
-      <input v-model="codeGame" type="text" @focus="errCode = ''" />
-      <br />
-      <span :class="{ errCode: errCode }">{{ errCode }}</span>
-      <br />
-      <button @click="joinGame">Join</button>
+    <div v-if="selectedGameMode === 'multiPlayer'" id="MULTIPLAYER">
+      <button class="btn" @click="createGame">generate game</button>
     </div>
   </div>
 </template>
 <script>
-import { ref } from "vue";
-import socket from "../socket";
-import Board from "./Board.vue";
-import axios from "axios";
+import { computed, ref } from "vue";
+import { getGameId } from "../services/games";
 import { useRouter } from "vue-router";
 
 export default {
-  components: {
-   /*  Board, */
-  },
-  props: {
-    gameMode: {
-      type: String,
-    },
-    name: {
-      type: String,
-    },
-  },
+  name: "ConfigGame",
   setup() {
-    const couplesCount = ref(null);
-    const singlePlayerMode = ref();
-    const gameDificulty = ref();
+    // State
 
+    const couplesCount = ref(null);
     const errCouples = ref("");
-    const shareCodeGame = ref(null);
-    const errCode = ref("");
-    const isVisibleBoard = ref(false);
-    const codeGame = ref(null);
+    const singlePlayerMode = ref("");
+    const gameDificulty = ref();
+    const gameMode = ref("");
 
     const router = useRouter();
-    //----SINGLEPLAYER
 
-    //----MULTIPLAYER
+    // Computed
+    const selectedGameMode = computed(() => gameMode.value);
+    const selectGameMode = (value) => {
+      if (value == 1) {
+        gameMode.value = "singlePlayer";
+      } else if (value == 2) {
+        gameMode.value = "multiPlayer";
+      }
+    };
 
     const createGame = async () => {
       if (couplesCount.value <= 0 || couplesCount.value === "") {
         errCouples.value = "Enter a valid number please";
         return;
       }
-      const userId = socket.userId;
-      const userName = socket.userName;
-
-      const response = await axios.post("http://localhost:3000/api/game", {
-        userId: userId,
-        userName: userName,
-        couplesCount: couplesCount.value,
-        singlePlayerMode: singlePlayerMode.value,
-        gameDificulty: gameDificulty.value
-      });
-      const gameId = response.data;
+      const gameId = await getGameId(
+        couplesCount.value,
+        singlePlayerMode.value,
+        gameDificulty.value
+      );
       router.push({
         path: `/game${gameId}`,
       });
     };
 
-    const joinGame = () => {
-      const gameId = codeGame.value;
-      const userId = socket.userId;
-      const userName = socket.userName;
-      if (!gameId) {
-        errCode.value = "Code is empty, enter a valid code";
-        return;
-      }
-      socket.emit("joinGame", {
-        gameId: gameId,
-        userId: userId,
-        userName: userName,
-      });
-    };
-
-    socket.on("catch_error", ({ err }) => {
-      if (err === "invalid couples") {
-        errCouples.value = "Enter a valid number please";
-      }
-      if (err === "invalid code") {
-        errCode.value = "Game not found, try again";
-      }
-    });
-
     return {
+      gameMode,
+      selectedGameMode,
       couplesCount,
       singlePlayerMode,
       gameDificulty,
+      selectGameMode,
       errCouples,
-      shareCodeGame,
-      errCode,
-      isVisibleBoard,
       createGame,
-      joinGame,
-      codeGame,
-      Board,
     };
   },
 };
 </script>
-<style>
-.errName,
-.errCouples,
-.errCode {
-  color: red;
-}
-</style>
+<style></style>

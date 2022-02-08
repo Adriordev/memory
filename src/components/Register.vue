@@ -1,66 +1,54 @@
 <template>
-  <section class="main-container">
-    <div class="header">
-      <h1>MEMORY GAME</h1>
-      <br />
-      <h2>
-        Welcome <span v-if="isRegister">{{ name }}</span> to memory's game
-      </h2>
-    </div>
-    <div v-if="!isRegister" class="register-name">
-      <label for="name">User name</label>
-      <input id="name" v-model="name" type="text" @focus="errName = ''" />
-      <span :class="{ errName: errName }">{{ errName }}</span>
+  <div
+    class="
+      flex flex-auto flex-col
+      justify-center
+      mx-auto
+      max-w-screen-md
+      m-4
+      p-4
+      border
+    "
+  >
+    <div class="flex flex-col p-10 border-2">
+      <div class="block border-2 border-black max-w-max mx-auto">
+        <label class="pl-2 pr-4 uppercase text-sm" for="name">User name:</label>
+        <input id="name" v-model="name" type="text" @focus="errName = ''" />
+      </div>
 
-      <button type="submit" @click="RegisterName">Enter</button>
+      <span class="error" :class="{ ' error-span': errName }">{{
+        errName
+      }}</span>
+      <button class="btn" @click="RegisterName">Enter</button>
     </div>
-    <div class="select-game">
-      <h3>Please, select a game mode</h3>
-      <button @click="selectGameMode(1)">Single player</button>
-      <button @click="selectGameMode(2)">Multi player</button>
-    </div>
-
-    <ConfigGame v-if="gameMode" :game-mode="gameMode" :name="name" />
-  </section>
+  </div>
 </template>
 
 <script>
-import { ref, onUnmounted } from "vue";
-
-import ConfigGame from "./ConfigGame.vue";
-import socket from "../socket";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 export default {
   name: "Register",
-  components: {
-    ConfigGame,
+  props: {
+    redirect: {
+      type: String,
+    },
   },
-  setup() {
+  setup(props) {
+    // State
     const name = ref(null);
-    const isRegister = ref(false);
     const errName = ref("");
-    const errCouples = ref("");
-    const gameMode = ref("");
-
-    const selectGameMode = (value) => {
-      if (value == 1) {
-        gameMode.value = "singlePlayer";
-      } else if (value == 2) {
-        gameMode.value = "multiPlayer";
-      }
-    };
-    //----User's register with socket.io ----
+    const isRegister = ref(false);
+    const router = useRouter();
+    // Functions
+    if (props.redirect) alert("Hi! you are new in game, please, enter a name");
 
     let session = localStorage.getItem("session");
+    session = JSON.parse(session);
     if (session) {
-      session = JSON.parse(session);
-
-      const sessionId = session.sessionId;
-      const userId = session.userId;
-      const userName = session.userName;
-
-      socket.auth = { sessionId, userId, userName };
-
-      socket.connect();
+      router.push({
+        name: "Config",
+      });
     }
 
     const RegisterName = () => {
@@ -68,51 +56,26 @@ export default {
         errName.value = "Enter a valid name please";
         return;
       }
-      const userName = name.value;
-      socket.auth = { userName };
-      socket.connect();
+      localStorage.setItem("session", JSON.stringify({ userName: name.value }));
+
+      if (props.redirect) {
+        router.push({
+          path: props.redirect,
+        });
+      } else {
+        router.push({
+          name: "Config",
+        });
+      }
     };
 
-    socket.on("session", ({ sessionId, userId, userName }) => {
-      socket.auth = { sessionId, userId, userName };
-      localStorage.setItem("session", JSON.stringify(socket.auth));
-      socket.sessionId = sessionId;
-      socket.userId = userId;
-      socket.userName = userName;
-
-      name.value = userName;
-      isRegister.value = true;
-    });
-
-    socket.on("connect_error", (err) => {
-      if (err.message === "invalid userName") {
-        errName.value = "Enter a valid name please";
-      }
-    });
-
-    onUnmounted(() => {
-      socket.off("connect_error");
-    });
-
     return {
-      ConfigGame,
-      selectGameMode,
-      gameMode,
       name,
+      errName,
       RegisterName,
       isRegister,
-      errName,
-      errCouples,
     };
   },
 };
 </script>
-
-<style>
-#app {
-  text-align: center;
-}
-.errName {
-  color: red;
-}
-</style>
+<style></style>

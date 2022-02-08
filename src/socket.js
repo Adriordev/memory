@@ -1,10 +1,15 @@
 import { io } from "socket.io-client";
 
-const URL = "http://localhost:3000";
-const socket = io(URL, { autoConnect: false });
+const URL = "http://localhost:3000/game";
 
-socket.onAny((event, ...args) => {
-  console.log(event, args);
-});
+export const socket =(id)=>{
+  console.log(id);
+  const gameSocket = io(URL+id, { autoConnect: false });
+  gameSocket.onAny((event, ...args) => {
+    console.log(event, args);
+  });
+  return gameSocket
+} 
 
-export default socket;
+
+
