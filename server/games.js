@@ -2,40 +2,16 @@ const crypto = require("crypto");
 const { getImages } = require("./services/getImages");
 const { shuffle } = require("./helpers/arrayHelpers");
 
-const createGame = async (
-  userId,
-  userName,
-  couples,
-  singlePlayerMode,
-  gameDificulty
-) => {
+const createGame = async (couples, singlePlayerMode, gameDificulty) => {
   const randomId = () => crypto.randomBytes(8).toString("hex");
   const gameId = randomId();
   const cards = [];
 
-  let score = [
-    {
-      userId: userId,
-      userName: userName,
-      foundCards: [],
-    },
-  ];
+  let score = [];
   let turn = null;
 
-  
+  let isStarted = false;
 
-  if (singlePlayerMode === "playerVsComputer") {
-    score.push({
-      userId: "computer",
-      userName: "Computer",
-      foundCards: [],
-    });
-    const turnIndex = Math.floor(Math.random() * (2 - 0)) + 0;
-    turn = score[turnIndex].userId;
-  }
-  if (singlePlayerMode === "playAlone") {
-    turn = score[0].userId;
-  }
   const shownCards = [];
 
   const isGameOver = false;
@@ -65,10 +41,36 @@ const createGame = async (
     cards,
     score,
     turn,
+    singlePlayerMode,
     gameDificulty,
     shownCards,
     isGameOver,
+    isStarted,
   };
+};
+
+const addPlayerToGame = (game, userId, userName) => {
+  game.score.push({
+    userId: userId,
+    userName: userName,
+    foundCards: [],
+  });
+  if (game.singlePlayerMode === "playerVsComputer") {
+    game.score.push({
+      userId: "computer",
+      userName: "Computer",
+      foundCards: [],
+    });
+  }
+  if (game.singlePlayerMode === "playAlone") {
+    game.turn = game.score[0].userId;
+    game.isStarted = true;
+  }
+  if (game.score.length == 2) {
+    const turnIndex = Math.floor(Math.random() * (2 - 0)) + 0;
+    game.turn = game.score[turnIndex].userId;
+    game.isStarted = true;
+  }
 };
 
 const games = new Map();
@@ -83,6 +85,7 @@ const findGame = (gameId) => {
 
 module.exports = {
   createGame,
+  addPlayerToGame,
   saveGame,
   findGame,
 };

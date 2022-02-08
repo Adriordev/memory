@@ -17,7 +17,7 @@ const io = new Server(server, {
 const PORT = process.env.PORT || 3000;
 
 const { saveSession, loadSession } = require("./session");
-const { createGame, saveGame, findGame } = require("./games");
+const { createGame, addPlayerToGame, saveGame, findGame } = require("./games");
 const {
   flipCard,
   checkIfCoupleWasFound,
@@ -28,8 +28,10 @@ const crypto = require("crypto");
 
 const randomId = () => crypto.randomBytes(8).toString("hex");
 
+let gameSocket = io.of(/^\/game\w+$/);
+
 //----INIT USERS middleware----
-io.use((socket, next) => {
+gameSocket.use((socket, next) => {
   const sessionId = socket.handshake.auth.sessionId;
   if (sessionId) {
     const sessionLoaded = loadSession(sessionId);
@@ -41,9 +43,6 @@ io.use((socket, next) => {
     return next();
   }
   const userName = socket.handshake.auth.userName;
-  if (!userName) {
-    return next(new Error("invalid userName"));
-  }
   socket.sessionId = randomId();
   socket.userId = randomId();
   socket.userName = userName;
@@ -52,11 +51,13 @@ io.use((socket, next) => {
 //----FINISH USERS middlware----
 
 //----INIT USERS connection----
-io.on("connection", (socket) => {
+gameSocket.on("connection", (socket) => {
+  console.log("connected");
   saveSession(socket.sessionId, {
     userId: socket.userId,
     userName: socket.userName,
   });
+
 
   socket.emit("session", {
     sessionId: socket.sessionId,
@@ -66,39 +67,16 @@ io.on("connection", (socket) => {
   //----FINISH USERS connection----
 
   //---- GAMES ACTIONS----
-
-  
-  socket.on('joinGameRoom', (game)=>{
-    console.log('entro');
-    socket.join(game.gameId)
-  })
-  /* socket.on("joinGame", ({ gameId, userId, userName }) => {
+  socket.on("joinGame", (gameId) => {
+    console.log('entro en joinGame');
     const game = findGame(gameId);
-    if (game === undefined) {
-      socket.emit("catch_error", { err: "invalid code" });
-      return;
+    console.log(findGame(gameId));
+    if (game.isStarted) {
+      socket.nsp.emit("startGame", game);
     }
-    const isUserAlreadyRegister = game.score.some(
-      (score) => score.userId === userId
-    );
-    if (!isUserAlreadyRegister) {
-      game.score.push({ userId: userId, userName: userName, foundCards: [] });
-      const turnIndex = Math.floor(Math.random() * (2 - 0)) + 0;
-      game.turn = game.score[turnIndex].userId;
-      saveGame(game);
-    }
-    socket.join(gameId);
-    if (game.score.length == 2) {
-      io.to(gameId).emit("updateGame", game);
-    }
-    return;
-  }); */
-  socket.on('joinGameRoom', (game)=>{
-    socket.join(game.gameId)
-  })
+  });
 
   socket.on("flipCard", ({ cardId, gameId, userId }) => {
-    
     let game = findGame(gameId);
 
     let flippedCards = game.cards.filter((c) => c.isFlipped);
@@ -108,43 +86,46 @@ io.on("connection", (socket) => {
     flipCard(cardId, game);
 
     saveGame(game);
-    
-    io.to(gameId).emit("updateFlippedCard", game);
+
+    socket.nsp.emit("updateFlippedCard", game);
 
     flippedCards = game.cards.filter((c) => c.isFlipped);
     if (flippedCards.length == 2) {
       checkIfCoupleWasFound(game);
 
-      io.to(gameId).emit("resetFlippedCards", flippedCards);
+      socket.nsp.emit("resetFlippedCards", flippedCards);
 
       checkGameOver(game);
 
       saveGame(game);
 
-      io.to(gameId).emit("updateGame", game);
+      socket.nsp.emit("updateGame", game);
     }
   });
   //----FINISH GAMES ACTIONS----
-  
 });
 app.post("/api/game", async (req, res) => {
-  const { userId, userName, couplesCount, singlePlayerMode, gameDificulty } =
-    req.body;
-  const game = await createGame(
-    userId,
-    userName,
-    couplesCount,
-    singlePlayerMode,
-    gameDificulty
-  );
+  const { couplesCount, singlePlayerMode, gameDificulty } = req.body;
+  const game = await createGame(couplesCount, singlePlayerMode, gameDificulty);
   saveGame(game);
   res.send(game.gameId);
 });
 
-app.get("/api/game:id", (req, res) => {
+app.put("/api/game:id", (req, res) => {
+  const { userId, userName } = req.body;
   const gameId = req.params.id;
   const game = findGame(gameId);
-  res.send(game);
+  const isUserAlreadyRegister = game.score.some(
+    (score) => score.userId === userId
+  );
+  if (game.isStarted && !isUserAlreadyRegister) {
+    return res.status(401).send({ error: "The game is full" });
+  }
+  if (!game.isStarted && !isUserAlreadyRegister) {
+    addPlayerToGame(game, userId, userName);
+    saveGame(game);
+  }
+  res.send(game.gameId);
 });
 
 server.listen(PORT, () => {
