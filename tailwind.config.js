@@ -1,4 +1,6 @@
+
 const colors = require("tailwindcss/colors");
+
 module.exports = {
   purge: ["./public/**/*.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   darkMode: false, // or 'media' or 'class'
@@ -8,6 +10,7 @@ module.exports = {
       md: "768px",
       lg: "976px",
       xl: "1440px",
+      
     },
     colors: {
       black: colors.black,
@@ -30,20 +33,13 @@ module.exports = {
       borderRadius: {
         "4xl": "2rem",
       },
-      keyframes: {
-        'fadeInDown': {
-          "0%": {
-            opacity: "0",
-            transform: "translateY(-50px)",
-          },
-          "100%": {
-            opacity: "1",
-            transform: "translateY(0)",
-          },
-        },
+      backgroundImage: {
+        main: "url('/images/woodenTable.jpg')",
+        board: "url('/images/wood2.jpg')"
       },
-      animation: {
-        'fadeInDown': "fade-in-down 1s ease-out",
+      gridTemplateColumns: {
+        'fluid': 'repeat(auto-fit, minmax(6rem, 10rem)); place-content: center',
+        'reduced': 'repeat(auto-fit, minmax(6rem, auto)); place-content: center'
       },
     },
   },

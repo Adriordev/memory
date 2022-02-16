@@ -1,16 +1,15 @@
 <template>
-  <div v-if="isWaitingOpponent" class="board">
-    <div class="score-container">
-      <Score
-        :score="dataGame.score"
-        :turn="dataGame.turn"
-        :is-game-over="dataGame.isGameOver"
-        :single-player-mode="dataGame.singlePlayerMode"
-      />
-    </div>
+  <div v-if="isWaitingOpponent" class="min-w-full  min-h-min p-3">
+    <Score
+      :score="dataGame.score"
+      :turn="dataGame.turn"
+      :is-game-over="dataGame.isGameOver"
+      :single-player-mode="dataGame.singlePlayerMode"
+    />
+
     <div
       v-if="!dataGame.isGameOver"
-      class="board-container"
+      class="grid grid-cols-reduced gap-1 row-auto md:grid-cols-fluid md:gap-4"
       :class="{ 'not-pointer': userCannotFlipCard }"
     >
       <Card
@@ -21,8 +20,36 @@
       />
     </div>
   </div>
-  <div v-else>
-    <h1>Waiting Opponent</h1>
+  <div
+    v-else
+    class="
+      animate-pulse
+      m-auto
+      box-border
+      rounded-lg
+      px-5
+      py-2.5
+      text-center
+      uppercase
+      shadow-2xl
+      bg-yellow-300
+    "
+  >
+    <h2 class="text-5xl font-semibold">Waiting</h2>
+    <h3
+      class="
+        box-border
+        rounded-lg
+        px-5
+        py-2.5
+        text-center
+        uppercase
+        shadow-2xl
+        bg-white
+      "
+    >
+      Share the URL to your opponent
+    </h3>
   </div>
 </template>
 
@@ -177,19 +204,4 @@ export default {
 };
 </script>
 
-<style>
-.board {
-  grid-area: board;
-}
-.board-container {
-  display: grid;
-  grid-gap: 5px;
-  grid-template-columns: repeat(auto-fit, minmax(25rem, 1fr));
-  margin: 1em;
-  padding: 1em;
-}
-.board-container.not-pointer {
-  pointer-events: none;
-  cursor: not-allowed;
-}
-</style>
+<style></style>

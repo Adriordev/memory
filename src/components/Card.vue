@@ -1,9 +1,15 @@
 <template>
-  <div class="scene" :class="{ 'is-hidden': isHidden }">
-    <div class="card" :class="{ 'is-flipped': isFlipped }" @click="handleFlip">
-      <div class="card__face card__face--front">MEMORY</div>
-      <div class="card__face card__face--back">
-        <img :src="img" :alt="img" />
+  <div class="scene max-w-max" :class="{ 'is-hidden': isHidden }">
+    <div
+      class="card shadow-lg w-24 h-24 md:w-36 md:h-36 lg:w-40 lg:h-40"
+      :class="{ 'is-flipped': isFlipped }"
+      @click="handleFlip"
+    >
+      <div class="card__face card__face--front"></div>
+      <div
+        class="card__face card__face--back"
+        :style="{ backgroundImage: 'url(' + `${img}` + ')' }"
+      >
       </div>
     </div>
   </div>
@@ -43,14 +49,11 @@ export default {
 
 <style>
 .scene {
-  width: 100%;
-  height: 20rem;
+  height: 100%;
   perspective: 1000px;
 }
 .card {
   position: relative;
-  width: 100%;
-  height: 100%;
   cursor: pointer;
   transform-style: preserve-3d;
   transform-origin: center right;
@@ -88,12 +91,9 @@ export default {
 
 .card__face--back {
   transform: rotateY(180deg);
-}
-img {
-  position: relative;
-  min-width: 100%;
-  min-height: 100%;
-  object-fit: cover;
+  background-position: center;
+  background-size: cover;
   border-radius: 2%;
 }
+
 </style>
