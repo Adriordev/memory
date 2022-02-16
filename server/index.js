@@ -3,6 +3,8 @@ const cors = require("cors");
 const app = express();
 app.use(express.json());
 app.use(cors());
+const serveStatic = require('serve-static')
+const path = require('path')
 
 const http = require("http");
 const server = http.createServer(app);
@@ -13,6 +15,11 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
+
+app.use('/', serveStatic(path.join(__dirname, '/dist')))
+app.get(/.*/, function (req, res) {
+	res.sendFile(path.join(__dirname, '/dist/index.html'))
+})
 
 const PORT = process.env.PORT || 3000;
 

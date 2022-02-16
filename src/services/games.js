@@ -1,11 +1,12 @@
 import axios from "axios";
+import { serverUrl } from "../constants";
 
 export const getGameId = async (
   couplesCount,
   singlePlayerMode,
   gameDificulty
 ) => {
-  const response = await axios.post("http://localhost:3000/api/game", {
+  const response = await axios.post(`${serverUrl}/api/game`, {
     couplesCount: couplesCount,
     singlePlayerMode: singlePlayerMode,
     gameDificulty: gameDificulty,
@@ -16,7 +17,7 @@ export const getGameId = async (
 
 export const addUsertoGame = async (userId, userName, gameId) => {
   try {
-    await axios.put(`http://localhost:3000/api/game${gameId}`, {
+    await axios.put(`${serverUrl}/api/game${gameId}`, {
       userId: userId,
       userName: userName,
     });
