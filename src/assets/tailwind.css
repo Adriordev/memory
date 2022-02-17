@@ -6,7 +6,7 @@
 
 @layer base {
   html body {
-    @apply  bg-main h-screen bg-cover bg-center ;
+    @apply  bg-main h-screen bg-fixed bg-cover bg-center bg-no-repeat ;
   }
 }
 
@@ -38,7 +38,7 @@
     @apply pointer-events-none cursor-not-allowed;
   }
   .turn-selector {
-    @apply box-border rounded-lg px-5 py-2.5 text-center uppercase shadow-2xl bg-yellow-300
+    @apply bg-yellow-300
     
     
   }

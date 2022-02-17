@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isWaitingOpponent" class="min-w-full  min-h-min p-3">
+  <div v-if="isWaitingOpponent" class="min-w-full min-h-min p-3">
     <Score
       :score="dataGame.score"
       :turn="dataGame.turn"
@@ -9,7 +9,7 @@
 
     <div
       v-if="!dataGame.isGameOver"
-      class="grid grid-cols-reduced gap-1 row-auto md:grid-cols-fluid md:gap-4"
+      class="grid grid-cols-reduced gap-1 row-auto md:grid-cols-medium md:gap-4 lg:grid-cols-fluid"
       :class="{ 'not-pointer': userCannotFlipCard }"
     >
       <Card

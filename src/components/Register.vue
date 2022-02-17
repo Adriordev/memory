@@ -1,4 +1,22 @@
 <template>
+  <div class="w-5/6 m-auto md:hidden">
+    <h4 class="text-xl text-gray-900 text-center font-bold">Welcome</h4>
+    <h4 class="text-xl text-gray-900 text-center font-bold">to</h4>
+    <h3
+      class="
+        text-2xl text-gray-900 text-center
+        font-bold
+        rounded-lg
+        px-5
+        py-2.5
+        uppercase
+        shadow-2xl
+        bg-yellow-300
+      "
+    >
+      Memory's game
+    </h3>
+  </div>
   <div
     class="
       flex
@@ -23,16 +41,18 @@
         border border-gray-200
         shadow-md
         text-center
-        md:p-6 md:flex flex-1 md:w-1/2 md:justify-center
+        md:p-6 md:flex
+        flex-1
+        md:w-1/2 md:justify-center
         items-center
         lg:p-8 lg:w-1/2
       "
     >
       <form action="#">
-        <h3 class="text-2xl text-gray-900 text-center font-bold">Register</h3>
-        <div class="space-y-4" >
+        <div class="space-y-4">
+          <h3 class="text-2xl text-gray-900 text-center font-bold">Register</h3>
           <label for="name" class="block mb-2 text-sm font-medium text-gray-900"
-            >Your name</label
+            >Please, enter your name</label
           >
           <input
             id="name"
@@ -153,7 +173,7 @@ export default {
     }
 
     const RegisterName = () => {
-      if (!name.value || name.value === ' ') {
+      if (!name.value || name.value === " ") {
         errName.value = "Enter a valid name please";
         return;
       }

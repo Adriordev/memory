@@ -1,23 +1,24 @@
 <template>
-  <div class="grid grid-cols-2 place-items-stretch gap-2 mb-2">
+  <div class="grid grid-cols-2 place-items-stretch gap-2 mb-2 mx-auto">
     <div
       v-for="player in score"
       :key="player.userId"
       class="
         box-border
         rounded-lg
-        py-2.5
         text-center
         uppercase
+        px-5
+        py-2.5
         shadow-2xl
         backdrop-filter backdrop-blur
       "
       :class="[turn === player.userId ? 'turn-selector' : '']"
     >
-      <h3 class="text-xs md:text-sm text-gray-900 font-bold text-center">
+      <h3 class="text-xs md:text-sm text-gray-900 font-bold">
         <span class="font-normal">Name:</span> {{ player.userName }}
       </h3>
-      <h3 class="text-xs md:text-sm text-gray-900 font-bold text-center">
+      <h3 class="text-xs md:text-sm text-gray-900 font-bold">
         <span class="font-normal">Couples found:</span>
         {{ player.foundCards.length }}
       </h3>
@@ -80,7 +81,7 @@
             uppercase
           "
         >
-          {{ winPlayerName }} WINS!
+          {{ winPlayerName }}
         </p>
       </div>
       <div>
@@ -117,9 +118,11 @@ export default {
     const isWinPlayer = computed(() => props.isGameOver && !isPlayAlone.value);
     const winPlayerName = computed(() =>
       isWinPlayer.value
-        ? props.score[0].foundCards.length > props.score[1].foundCards.length
-          ? props.score[0].userName
-          : props.score[1].userName
+        ? props.score[0].foundCards.length === props.score[1].foundCards.length
+          ? "draw"
+          : props.score[0].foundCards.length > props.score[1].foundCards.length
+          ? props.score[0].userName + ' wins!'
+          : props.score[1].userName + ' wins!'
         : ""
     );
     const backToConfig = () => {

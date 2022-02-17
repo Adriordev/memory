@@ -11,7 +11,7 @@
       rounded-lg
       shadow-md
       blurBackground
-      md:w-4/5 md:flex-row 
+      md:w-4/5 md:flex-row
       lg:w-3/4
     "
   >
@@ -19,8 +19,7 @@
       class="
         space-y-4
         p-4
-        flex
-        flex-col
+        flex flex-col
         justify-center
         items-center
         w-full
@@ -34,7 +33,7 @@
       "
     >
       <h3 class="text-xl text-gray-900 font-bold text-center">
-        Please, select a game mode
+        Select a game mode
       </h3>
 
       <button class="btn" @click="selectGameMode(1)">Singleplayer</button>
@@ -45,8 +44,7 @@
       class="
         space-y-4
         p-4
-        flex
-        flex-col
+        flex flex-col
         justify-center
         items-center
         w-full
@@ -75,7 +73,7 @@
       }}</span>
 
       <div v-if="selectedGameMode === 'singlePlayer' && !isSecondStep">
-        <h3>Please, select an option</h3>
+        <h3>Select an option</h3>
         <div class="first-step">
           <input
             v-model="singlePlayerMode"
@@ -95,27 +93,27 @@
         </div>
         <div v-if="singlePlayerMode === 'playerVsComputer'">
           <div class="game-dificulty">
-            <label for="easy">Easy</label>
             <input
               v-model="gameDificulty"
               type="radio"
               name="gameDificulty"
               value="easy"
             />
-            <label for="normal">Normal</label>
+            <label for="easy">Easy</label>
             <input
               v-model="gameDificulty"
               type="radio"
               name="gameDificulty"
               value="normal"
             />
-            <label for="hard">Hard</label>
+            <label for="normal">Normal</label>
             <input
               v-model="gameDificulty"
               type="radio"
               name="gameDificulty"
               value="hard"
             />
+            <label for="hard">Hard</label>
           </div>
         </div>
       </div>
@@ -137,7 +135,7 @@ export default {
     const couplesCount = ref(null);
     const errCouples = ref("");
     const singlePlayerMode = ref("");
-    const gameDificulty = ref();
+    const gameDificulty = ref("easy");
     const isSecondStep = ref(false);
     const isFinishStep = ref(false);
     const gameMode = ref("");

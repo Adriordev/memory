@@ -1,7 +1,7 @@
 <template>
   <div class="scene max-w-max" :class="{ 'is-hidden': isHidden }">
     <div
-      class="card shadow-lg w-24 h-24 md:w-36 md:h-36 lg:w-40 lg:h-40"
+      class="card shadow-lg w-20 h-20 md:w-28 md:h-28 lg:w-40 lg:h-40"
       :class="{ 'is-flipped': isFlipped }"
       @click="handleFlip"
     >
