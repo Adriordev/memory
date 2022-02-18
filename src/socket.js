@@ -1,7 +1,7 @@
 import { io } from "socket.io-client";
 import {serverUrl} from './constants'
 
-const URL = serverUrl+"/game";
+const URL = serverUrl+"/game/";
 console.log(URL);
 export const socket =(id)=>{
   console.log(id);

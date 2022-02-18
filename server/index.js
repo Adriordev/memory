@@ -17,6 +17,7 @@ const io = new Server(server, {
 });
 
 app.use('/', serveStatic(path.join(__dirname, '/dist')))
+
 app.get(/.*/, function (req, res) {
 	res.sendFile(path.join(__dirname, '/dist/index.html'))
 })
@@ -35,7 +36,7 @@ const crypto = require("crypto");
 
 const randomId = () => crypto.randomBytes(8).toString("hex");
 
-let gameSocket = io.of(/^\/game\w+$/);
+let gameSocket = io.of(/^\/game\/\w+$/);
 
 //----INIT USERS middleware----
 gameSocket.use((socket, next) => {
@@ -112,13 +113,13 @@ gameSocket.on("connection", (socket) => {
   //----FINISH GAMES ACTIONS----
 });
 app.post("/api/game", async (req, res) => {
-  const { couplesCount, singlePlayerMode, gameDificulty } = req.body;
-  const game = await createGame(couplesCount, singlePlayerMode, gameDificulty);
+  const { couplesCount, gameMode, gameDificulty } = req.body;
+  const game = await createGame(couplesCount, gameMode, gameDificulty);
   saveGame(game);
   res.send(game.gameId);
 });
 
-app.put("/api/game:id", (req, res) => {
+app.put("/api/game/:id", (req, res) => {
   const { userId, userName } = req.body;
   const gameId = req.params.id;
   const game = findGame(gameId);

@@ -2,7 +2,7 @@ const crypto = require("crypto");
 const { getImages } = require("./services/getImages");
 const { shuffle } = require("./helpers/arrayHelpers");
 
-const createGame = async (couples, singlePlayerMode, gameDificulty) => {
+const createGame = async (couples, gameMode, gameDificulty) => {
   const randomId = () => crypto.randomBytes(8).toString("hex");
   const gameId = randomId();
   const cards = [];
@@ -41,7 +41,7 @@ const createGame = async (couples, singlePlayerMode, gameDificulty) => {
     cards,
     score,
     turn,
-    singlePlayerMode,
+    gameMode,
     gameDificulty,
     shownCards,
     isGameOver,
@@ -55,14 +55,14 @@ const addPlayerToGame = (game, userId, userName) => {
     userName: userName,
     foundCards: [],
   });
-  if (game.singlePlayerMode === "playerVsComputer") {
+  if (game.gameMode === "singleplayer") {
     game.score.push({
       userId: "computer",
       userName: "Computer",
       foundCards: [],
     });
   }
-  if (game.singlePlayerMode === "playAlone") {
+  if (game.gameMode === "practice") {
     game.turn = game.score[0].userId;
     game.isStarted = true;
   }

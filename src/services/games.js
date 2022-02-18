@@ -3,12 +3,13 @@ import { serverUrl } from "../constants";
 
 export const getGameId = async (
   couplesCount,
-  singlePlayerMode,
+  gameMode,
   gameDificulty
 ) => {
+  console.log(couplesCount, gameMode, gameDificulty);
   const response = await axios.post(`${serverUrl}/api/game`, {
     couplesCount: couplesCount,
-    singlePlayerMode: singlePlayerMode,
+    gameMode: gameMode,
     gameDificulty: gameDificulty,
   });
   const gameId = response.data;
@@ -17,7 +18,7 @@ export const getGameId = async (
 
 export const addUsertoGame = async (userId, userName, gameId) => {
   try {
-    await axios.put(`${serverUrl}/api/game${gameId}`, {
+    await axios.put(`${serverUrl}/api/game/${gameId}`, {
       userId: userId,
       userName: userName,
     });

@@ -4,7 +4,7 @@
       :score="dataGame.score"
       :turn="dataGame.turn"
       :is-game-over="dataGame.isGameOver"
-      :single-player-mode="dataGame.singlePlayerMode"
+      :single-player-mode="dataGame.gameMode"
     />
 
     <div
@@ -83,7 +83,7 @@ export default {
       score: [],
       turn: "",
       isGameOver: false,
-      singlePlayerMode: "",
+      gameMode: "",
       gameDificulty: "",
       shownCards: [],
     });
@@ -135,7 +135,6 @@ export default {
       gameSocket.connect();
     }
     gameSocket.on("session", async ({ sessionId, userId, userName }) => {
-      console.log("vuelvo");
       gameSocket.auth = { sessionId, userId, userName };
       localStorage.setItem("session", JSON.stringify(gameSocket.auth));
       gameSocket.sessionId = sessionId;
