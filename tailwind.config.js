@@ -38,8 +38,9 @@ module.exports = {
         board: "url('/images/wood2.jpg')"
       },
       gridTemplateColumns: {
-        'fluid': 'repeat(auto-fit, minmax(6rem, 10rem)); place-content: center',
-        'reduced': 'repeat(auto-fit, minmax(6rem, auto)); place-content: center'
+        'fluid': 'repeat(auto-fit, minmax(auto, 10rem)); place-content: center; place-items: center',
+        'medium': 'repeat(auto-fit, minmax(7rem, auto)); place-content: center; place-items: center',
+        'reduced': 'repeat(auto-fit, minmax(5rem, auto)); place-content: center; place-items: center'
       },
     },
   },
