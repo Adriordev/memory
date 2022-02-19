@@ -6,7 +6,6 @@ export const getGameId = async (
   gameMode,
   gameDificulty
 ) => {
-  console.log(couplesCount, gameMode, gameDificulty);
   const response = await axios.post(`${serverUrl}/api/game`, {
     couplesCount: couplesCount,
     gameMode: gameMode,

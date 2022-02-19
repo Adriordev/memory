@@ -33,6 +33,11 @@
   >
     <div
       class="
+        flex flex-1
+        justify-center
+        items-center
+        text-center
+        
         p-4
         w-full
         h-80
@@ -40,16 +45,12 @@
         rounded-lg
         border border-gray-200
         shadow-md
-        text-center
-        md:p-6 md:flex
-        flex-1
-        md:w-1/2 md:justify-center
-        items-center
+        md:p-6
         lg:p-8 lg:w-1/2
       "
     >
-      <form action="#">
-        <div class="space-y-4">
+      <form class="space-y-4" action="#">
+        
           <h3 class="text-2xl text-gray-900 text-center font-bold">Register</h3>
           <label for="name" class="block mb-2 text-sm font-medium text-gray-900"
             >Please, enter your name</label
@@ -85,7 +86,7 @@
           >
             Enter
           </button>
-        </div>
+        
       </form>
     </div>
 

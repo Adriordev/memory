@@ -3,15 +3,15 @@
     class="
       flex flex-col
       w-5/6
+      h-5/6
       m-auto
       gap-2
       justify-between
       p-2
-      h-auto
       rounded-lg
       shadow-md
       blurBackground
-      md:w-4/5 md:flex-row
+      md:w-4/5 md:h-auto md:flex-row
       lg:w-3/4
     "
   >
@@ -211,7 +211,7 @@ export default {
     const couplesCount = ref(null);
     const errCouples = ref("");
     const gameDificulty = ref("easy");
-    const gameMode = ref("");
+    const gameMode = ref("singleplayer");
     const typeGameMode = ref("normal");
     const router = useRouter();
 

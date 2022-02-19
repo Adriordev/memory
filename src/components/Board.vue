@@ -9,7 +9,13 @@
 
     <div
       v-if="!dataGame.isGameOver"
-      class="grid grid-cols-reduced gap-1 row-auto md:grid-cols-medium md:gap-4 lg:grid-cols-fluid"
+      class="
+        grid grid-cols-reduced
+        gap-1
+        row-auto
+        md:grid-cols-medium md:gap-4
+        lg:grid-cols-fluid
+      "
       :class="{ 'not-pointer': userCannotFlipCard }"
     >
       <Card
@@ -29,10 +35,11 @@
       rounded-lg
       px-5
       py-2.5
+      space-y-4
       text-center
       uppercase
       shadow-2xl
-      bg-yellow-300
+      bg-white
     "
   >
     <h2 class="text-5xl font-semibold">Waiting</h2>
@@ -45,7 +52,7 @@
         text-center
         uppercase
         shadow-2xl
-        bg-white
+        bg-yellow-300
       "
     >
       Share the URL to your opponent
@@ -83,6 +90,7 @@ export default {
       score: [],
       turn: "",
       isGameOver: false,
+      isStarted: false,
       gameMode: "",
       gameDificulty: "",
       shownCards: [],
@@ -96,6 +104,7 @@ export default {
     );
     const userCannotFlipCard = computed(() => flippedCards.value.length == 2);
     const isWaitingOpponent = computed(() => dataGame.value.isStarted);
+
     //Functions
 
     onUpdated(() => {
@@ -177,12 +186,6 @@ export default {
       });
     });
 
-    /* socket.on("catch_error", ({ err }) => {
-      if (err === "invalid couples") {
-        errCouples.value = "Enter a valid number please";
-      }
-    }); */
-
     const flipCard = (id) => {
       gameSocket.emit("flipCard", {
         cardId: id,
@@ -197,7 +200,7 @@ export default {
       Card,
       Score,
       userCannotFlipCard,
-      isWaitingOpponent,
+      isWaitingOpponent
     };
   },
 };

@@ -76,7 +76,6 @@ gameSocket.on("connection", (socket) => {
 
   //---- GAMES ACTIONS----
   socket.on("joinGame", (gameId) => {
-    console.log('entro en joinGame');
     const game = findGame(gameId);
     console.log(findGame(gameId));
     if (game.isStarted) {
