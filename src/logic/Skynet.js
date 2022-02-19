@@ -18,7 +18,8 @@ export const computerPlayGame = (
         cards,
         shownCards,
         getRandomIndex,
-        possibleCards
+        possibleCards,
+        false
       );
       break;
     case "hard":
@@ -27,7 +28,7 @@ export const computerPlayGame = (
         cards,
         shownCards,
         getRandomIndex,
-        possibleCards
+        possibleCards,
       );
       break;
     default:
@@ -45,7 +46,8 @@ const skynetNormalMode = (
   cards,
   shownCards,
   getRandomIndex,
-  possibleCards
+  possibleCards,
+  isHardMode
 ) => {
   const flippedCards = cards.filter((c) => c.isFlipped);
   if (flippedCards.length == 0) {
@@ -60,12 +62,14 @@ const skynetNormalMode = (
     );
     if (shownCouple) {
       computerCardId.value = shownCouple.id;
-    } else {
+    } else if (isHardMode) {
       const getIdsShownCards = shownCards.map((r) => r.id);
       const restCards = possibleCards.filter(
         (val) => !getIdsShownCards.includes(val.id)
       );
       computerCardId.value = restCards[0].id;
+    }else{
+      SkynetEasyMode(computerCardId, getRandomIndex, possibleCards);
     }
   }
 };
@@ -93,7 +97,8 @@ const SkynetHardMode = (
     cards,
     shownCards,
     getRandomIndex,
-    possibleCards
+    possibleCards,
+    true
   );
 };
 
