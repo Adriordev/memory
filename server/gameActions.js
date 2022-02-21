@@ -1,9 +1,10 @@
-/* const { sleep } = require("./helpers/sleepHelper"); */
-
 const flipCard = (cardId, game) => {
   const selectCardtoFlip = game.cards.find((c) => c.id === cardId);
   selectCardtoFlip.isFlipped = true;
   game.shownCards.push(selectCardtoFlip);
+  if (game.gameDificulty === "normal" && game.shownCards.length > 8) {
+    game.shownCards.splice(0, 2);
+  }
 };
 
 const checkIfCoupleWasFound = (game) => {
