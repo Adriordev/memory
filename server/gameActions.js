@@ -1,9 +1,11 @@
-/* const { sleep } = require("./helpers/sleepHelper"); */
-
 const flipCard = (cardId, game) => {
   const selectCardtoFlip = game.cards.find((c) => c.id === cardId);
   selectCardtoFlip.isFlipped = true;
   game.shownCards.push(selectCardtoFlip);
+  if (game.gameDificulty === "normal" && game.shownCards.length > 8) {
+    game.shownCards.splice(0, 1);
+  }
+  console.log(game.shownCards.length);
 };
 
 const checkIfCoupleWasFound = (game) => {
