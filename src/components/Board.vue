@@ -58,12 +58,14 @@
       Share the URL to your opponent
     </h3>
   </div>
+  <ModalGameFull v-show="isModalVisible" @close="closeModal" />
 </template>
 
 <script>
 import { socket } from "../socket";
 import Card from "./Card.vue";
 import Score from "./Score.vue";
+import ModalGameFull from "./ModalGameFull.vue";
 import { computed, ref, onUpdated } from "vue";
 import { addUsertoGame } from "./../services/games";
 import { computerPlayGame } from "../logic/Skynet";
@@ -76,6 +78,7 @@ export default {
   components: {
     Card,
     Score,
+    ModalGameFull,
   },
   props: {
     id: {
@@ -95,7 +98,7 @@ export default {
       gameDificulty: "",
       shownCards: [],
     });
-
+    const isModalVisible = ref(false);
     const router = useRouter();
 
     // Computed
@@ -129,6 +132,17 @@ export default {
       }
     });
 
+    const showModal = () => {
+      isModalVisible.value = true;
+    };
+
+    const closeModal = () => {
+      isModalVisible.value = false;
+      router.push({
+          name: "Config",
+        });
+    };
+
     const gameSocket = socket(props.id);
 
     let session = localStorage.getItem("session");
@@ -158,9 +172,7 @@ export default {
       if (userSuccesfullyAdded) {
         gameSocket.emit("joinGame", props.id);
       } else {
-        router.push({
-          name: "Config",
-        });
+        showModal();
       }
     });
 
@@ -200,7 +212,10 @@ export default {
       Card,
       Score,
       userCannotFlipCard,
-      isWaitingOpponent
+      isWaitingOpponent,
+      isModalVisible,
+      showModal,
+      closeModal,
     };
   },
 };
