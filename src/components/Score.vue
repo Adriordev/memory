@@ -119,7 +119,7 @@ export default {
     const winPlayerName = computed(() =>
       isWinPlayer.value
         ? props.score[0].foundCards.length === props.score[1].foundCards.length
-          ? "draw"
+          ? "game in draw"
           : props.score[0].foundCards.length > props.score[1].foundCards.length
           ? props.score[0].userName + ' wins!'
           : props.score[1].userName + ' wins!'

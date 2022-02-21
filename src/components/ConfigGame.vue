@@ -35,9 +35,27 @@
       <h3 class="text-xl text-gray-900 font-bold text-center">
         Select a game mode
       </h3>
-      <button class="btn" @click="selectGameMode(1)">Practice</button>
-      <button class="btn" @click="selectGameMode(2)">Singleplayer</button>
-      <button class="btn" @click="selectGameMode(3)">Multiplayer</button>
+      <button
+        class="btn"
+        :class="{ selected: gameMode === 'practice' }"
+        @click="selectGameMode(1)"
+      >
+        Practice
+      </button>
+      <button
+        class="btn"
+        :class="{ selected: gameMode === 'singleplayer' }"
+        @click="selectGameMode(2)"
+      >
+        Singleplayer
+      </button>
+      <button
+        class="btn"
+        :class="{ selected: gameMode === 'multiplayer' }"
+        @click="selectGameMode(3)"
+      >
+        Multiplayer
+      </button>
     </div>
     <div
       class="
@@ -220,7 +238,7 @@ export default {
     const selectedGameMode = computed(() => gameMode.value);
 
     // Functions
-
+    
     const selectGameMode = (value) => {
       if (value == 1) {
         gameMode.value = "practice";

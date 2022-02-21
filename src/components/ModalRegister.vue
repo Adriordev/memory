@@ -33,7 +33,7 @@
           border-b-2
         "
       >
-        <slot name="header"> Uops! </slot>
+        <slot name="header"> Welcome! </slot>
       </header>
 
       <section

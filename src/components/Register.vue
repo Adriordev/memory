@@ -80,7 +80,7 @@
               shadow-2xl
               border-yellow-300
               bg-yellow-300
-              hover:bg-yellow-500 hover:border-yellow-500 hover:text-black;
+              hover:bg-yellow-500 hover:border-yellow-500 hover:text-white
             "
             @click="RegisterName"
           >
